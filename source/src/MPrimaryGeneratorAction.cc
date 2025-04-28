@@ -1463,6 +1463,7 @@ double MPrimaryGeneratorAction::cosmicNeutBeam(double t, double p) {
     double I0 = pow(En, -2.95);
     
     // From L.Faure Thesis
+    // https://www.ge.infn.it/~batta/antinu/Tesi_Specialistica_Faure_Laura.pdf
     // Total normalization (neutrons/cm2/s):
     // 10-9 - 10-6:     2.0e-3
     // 10-6 - 2 MeV    30.0e-3
