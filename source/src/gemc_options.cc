@@ -1137,5 +1137,50 @@ void goptions::setGoptions()
 	optMap["DF"].type  = 1;
 	optMap["DF"].ctgr  = "general";
 	optMap["DF"].repe  = 1;
+    
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    // Dark Matter
+    // --------------
+    
+    /* Vanilla Dark Photon model */
+    optMap["DARK_PHOTON"].args = "no";
+    optMap["DARK_PHOTON"].help = "Dark Photon parameters: mass, spin*2, parity\n";
+    optMap["DARK_PHOTON"].help += "example: -DARK_PHOTON=\"200*MeV,2,-1\"";
+    optMap["DARK_PHOTON"].type = 1;
+    optMap["DARK_PHOTON"].ctgr = "dark_photon";
 
+    optMap["DARK_MATTER"].args = "no";
+    optMap["DARK_MATTER"].help = "Dark Matter parameters: mass, spin*2\n";
+    optMap["DARK_MATTER"].help += "example: -DARK_MATTER=\"200*MeV,1\"";
+    optMap["DARK_MATTER"].type = 1;
+    optMap["DARK_MATTER"].ctgr = "dark_photon";
+
+    optMap["DARK_COUPLINGS"].args = "no";
+    optMap["DARK_COUPLINGS"].help = "Dark photon couplings: eps, alphaD, min_kin_energy\n";
+    optMap["DARK_COUPLINGS"].help += "example: -DARK_COUPLINGS=\"0.001,0.5,0.1*GeV\"";
+    optMap["DARK_COUPLINGS"].type = 1;
+    optMap["DARK_COUPLINGS"].ctgr = "dark_photon";
+    /* end of Dark Photon model */
+    
+    /* Dark Scalar model */
+    optMap["DARK_SCALAR"].args = "no";
+    optMap["DARK_SCALAR"].help = "Dark Scalar parameters: mass, coupling\n";
+    optMap["DARK_SCALAR"].help += "example: -DARK_PHOTON=\"100*MeV,3.87e-4\"";
+    optMap["DARK_SCALAR"].type = 1;
+    optMap["DARK_SCALAR"].ctgr = "dark_scalar";
+    
+    optMap["DARK_SCALAR_BIAS"].arg = 0;
+    optMap["DARK_SCALAR_BIAS"].help = "Flat increase Dark Scalar production rate\n";
+    optMap["DARK_SCALAR_BIAS"].name = "Set bias for dark scalar production (e.g. 1e7)";
+    optMap["DARK_SCALAR_BIAS"].type = 0;
+    optMap["DARK_SCALAR_BIAS"].ctgr = "dark_scalar_bias";
+    /* end of Dark Scalar*/
 }

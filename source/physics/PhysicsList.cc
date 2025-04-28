@@ -41,6 +41,15 @@ using namespace gstring;
 #include "G4MuonRadiativeDecayChannelWithSpin.hh"
 #include "G4MuonDecayChannelWithSpin.hh"
 
+// Vanilla Dark Photon
+#include "G4DarkMatter.h"
+#include "G4LDMEleScattering.h"
+
+// Dark Scalar
+#include "G4MuonScalarProduction.h"
+#include "G4DarkScalar.h"
+
+
 // CLHEP units
 #include "CLHEP/Units/PhysicalConstants.h"
 using namespace CLHEP;
@@ -421,6 +430,72 @@ void PhysicsList::ConstructParticle()
 		G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
 	}
 
+    /*  Vanilla Dark Photon model parameters */
+    // TO DO: generalize to other models of DM
+    if (gemcOpt.optMap["DARK_PHOTON"].args == "no" || gemcOpt.optMap["DARK_MATTER"].args == "no" || gemcOpt.optMap["DARK_COUPLINGS"].args == "no") {
+        return;
+    }
+    
+    vector<string> valuesDP;
+    valuesDP = get_info(gemcOpt.optMap["DARK_PHOTON"].args);
+    if (valuesDP.size() != 3) {
+        cout << " ERROR, DARK_PHOTON should follow with three numbers: mass, 2*J,P quantum numbers, as in 100*MeV,2,-1" << endl;
+        exit(1);
+    }
+    vector<string> valuesDM;
+    valuesDM = get_info(gemcOpt.optMap["DARK_MATTER"].args);
+    if (valuesDM.size() != 2) {
+        cout << " ERROR, DARK_MATTER should follow with two numbers: mass 2*J,  quantum numbers, as in 100*MeV,1" << endl;
+        exit(1);
+    }
+    vector<string> valuesC;
+    valuesC = get_info(gemcOpt.optMap["DARK_COUPLINGS"].args);
+    if (valuesC.size() != 2) {
+        cout << " ERROR, DARK_COUPLINGS should follow with two numbers: eps and alphaD, as in 1E-4,0.1" << endl;
+        exit(1);
+    }
+
+    G4double darkPhotonMass = get_number(valuesDP[0]);
+    G4double darkMatterMass = get_number(valuesDM[0]);
+    G4double eps = get_number(valuesC[0]);
+    G4double alphaD = get_number(valuesC[1]);
+
+    G4int darkPhotonJ = atoi(valuesDP[1].c_str());
+    G4int darkPhotonP = atoi(valuesDP[2].c_str());
+    G4int darkMatterJ = atoi(valuesDM[1].c_str());
+
+    if (darkPhotonJ < 0) {
+        cout << " ERROR, darkPhoton spin should be > 0, you entered: " << darkPhotonJ << endl;
+        exit(1);
+    }
+    if (abs(darkPhotonJ) % 2 != 0) {
+        cout << " ERROR, darkPhoton spin should be integer, you entered: " << darkPhotonJ << endl;
+        exit(1);
+    }
+    if (darkMatterJ < 0) {
+        cout << " ERROR, darkMatter spin should be > 0, you entered: " << darkMatterJ << endl;
+        exit(1);
+    }
+
+    G4DarkMatter::DarkMatterDefinition(darkMatterMass, darkMatterJ);
+    /* end of Vanilla Dark Photon model */
+    
+    /* Dark Scalar model */
+    if (gemcOpt.optMap["DARK_SCALAR"].args == "no") {
+        return;
+    }
+    
+    vector<string> valuesDS;
+    valuesDS = get_info(gemcOpt.optMap["DARK_SCALAR"].args);
+    if(valuesDS.size() != 2) {
+        cout << "ERROR, DARK_SCALAR shoudl follow with this two numbers: mass, coupling, as in 100*MeV, 3.87e-4" << endl;
+        exit(1);
+    }
+    G4double scalarMass = get_number(valuesDS[0]);
+    G4double g_mu = get_number(valuesDS[1]);
+    
+    G4DarkScalar::DarkScalarDefinition(scalarMass, g_mu);
+    /* end of Dark Scalar */
 }
 
 
@@ -507,6 +582,56 @@ void PhysicsList::ConstructProcess()
 					pmanager->SetProcessOrderingToLast(theDecayProcess, idxAtRest);
 				}
 			}
+            
+            /* Vanilla Dark Photon Model */
+            if (gemcOpt.optMap["DARK_PHOTON"].args == "no" || gemcOpt.optMap["DARK_MATTER"].args == "no" || gemcOpt.optMap["DARK_COUPLINGS"].args == "no") {
+                return;
+            } else {
+                //A' production
+                vector<string> valuesC;
+                valuesC = get_info(gemcOpt.optMap["DARK_COUPLINGS"].args);
+                if (valuesC.size() != 2) {
+                    cout << " ERROR, DARK_COUPLINGS should follow with two numbers: eps and alphaD, as in 1E-4,0.1" << endl;
+                    exit(1);
+                }
+                
+                G4double eps = get_number(valuesC[0]);
+                G4double alphaD = get_number(valuesC[1]);
+                
+                particle = G4DarkMatter::DarkMatter();
+                pmanager = particle->GetProcessManager();
+                G4LDMEleScattering* myLDMEleScattering = new G4LDMEleScattering;
+                myLDMEleScattering->SetEps(eps);
+                myLDMEleScattering->SetAlphaD(alphaD);
+                pmanager->AddDiscreteProcess(myLDMEleScattering);
+                
+                // TO DO
+                // Include model variations: Dark Photon J, inelastic
+            }
+            /* end of Dark Photon model */
+            
+            /* Dark Scalar model */
+            if (gemcOpt.optMap["DARK_SCALAR"].args == "no") {
+                return;
+            } else {
+                
+                G4double DSbias = 1;
+                if(gemcOpt.optMap["DARK_SCALAR_BIAS"].args != 0)
+                    DSbias = gemcOpt.optMap["DARK_SCALAR_BIAS"].arg;
+                
+                G4MuonScalarProduction* myMuonScalarProduction = new G4MuonScalarProduction;
+                myMuonScalarProduction->SetCrossSecFactor(DSbias);
+                
+                //Scalar production
+                particle = G4MuonPlus::MuonPlus();
+                pmanager = particle->GetProcessManager();
+                pmanager->AddDiscreteProcess(myMuonScalarProduction);
+                
+                particle = G4MuonMinus::MuonMinus();
+                pmanager = particle->GetProcessManager();
+                pmanager->AddDiscreteProcess(myMuonScalarProduction);
+            }
+            /* end of Dark Scalar */
 		}
 	}
 }

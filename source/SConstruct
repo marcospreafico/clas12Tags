@@ -89,7 +89,11 @@ env.Append(CPPPATH = 'physics')
 phys_sources = Split("""
 	physics/PhysicsList.cc
 	physics/GammaNuclearPhysics.cc
-	physics/PhysicsListMessenger.cc""")
+	physics/PhysicsListMessenger.cc
+	physics/G4DarkMatter.cc
+	physics/G4LDMEleSCattering.cc
+	physics/G4DarkScalar.cc
+	physics/G4MuonScalarProduction.cc""")
 env.Library(source = phys_sources, target = "lib/gphysics")
 
 # Fields
