@@ -616,7 +616,7 @@ void PhysicsList::ConstructProcess()
             } else {
                 
                 G4double DSbias = 1;
-                if(gemcOpt.optMap["DARK_SCALAR_BIAS"].args != 0)
+                if(gemcOpt.optMap["DARK_SCALAR_BIAS"].arg != 0)
                     DSbias = gemcOpt.optMap["DARK_SCALAR_BIAS"].arg;
                 
                 G4MuonScalarProduction* myMuonScalarProduction = new G4MuonScalarProduction;

@@ -73,6 +73,9 @@ HipoSchema::HipoSchema() {
     rawVTPSchema = hipo::schema("RAW::vtp", 20000, 14);
     rawEPICSSchema = hipo::schema("RAW::epics", 20000, 15);
     rasterADCSchema = hipo::schema("RASTER::adc", 22200, 11);
+    
+    //M.S. BDX
+    bdxCRSSchema = hipo::schema("BDX::crs", 90000, 99);
 
     // Defining structure of the schema (bank)
     // The columns in the banks (or leafs, if you like ROOT)
@@ -154,6 +157,11 @@ HipoSchema::HipoSchema() {
     rawEPICSSchema.parse("json/B");
 
     emptySchema.parse("empty/B");
+    
+    // M.S. BDX schemas
+    //I-integer, S-short, B-byte, F-float,
+    //                   D-double, L-long
+    bdxCRSSchema.parse("sector/B, layer/B, component/S, order/B, ADC/I, time/F, ped/S");
 
     schemasToLoad["RUN::config"] = runConfigSchema;
     schemasToLoad["RUN::rf"] = runRFSchema;
@@ -201,6 +209,9 @@ HipoSchema::HipoSchema() {
     schemasToLoad["RASTER::adc"] = rasterADCSchema;
     schemasToLoad["URWELL::adc"] = urwellADCSchema;
     schemasToLoad["RECOIL::adc"]  = recoilADCSchema;
+    
+    //M.S. ADC
+    schemasToLoad["BDX::crs"] = bdxCRSSchema; 
 
     cout << " Done defining Hipo4 schemas." << endl;
 
@@ -228,7 +239,9 @@ hipo::schema HipoSchema::getSchema(string schemaName, int type) {
         return fthodoADCSchema;
     } else if (schemaName == "ft_trk") {
         return ftrkTDCSchema;
-    } else {
+    } else if (schemaName == "crs"){
+        return bdxCRSSchema;
+    } else{
         if (non_registered_detectors(schemaName, type)) {
             cout << " SCHEMA " << schemaName << " " << " not found for type " << type << " = " << schemaType << endl;
         }
@@ -252,7 +265,7 @@ bool HipoSchema::non_registered_detectors(string schemaName, int type) {
         if (schemaName == "atof" || schemaName == "band" || schemaName == "bmt" || schemaName == "fmt" || schemaName == "ftm"
             || schemaName == "dc" || schemaName == "bst" || schemaName == "cnd" || schemaName == "ctof" || schemaName == "ecal"
             || schemaName == "ftof" || schemaName == "ft_cal" || schemaName == "ft_hodo" || schemaName == "ft_trk"
-            || schemaName == "htcc" || schemaName == "ltcc" || schemaName == "rich" || schemaName == "rtpc" || schemaName == "urwell" || schemaName == "recoil" || schemaName == "flux") {
+            || schemaName == "htcc" || schemaName == "ltcc" || schemaName == "rich" || schemaName == "rtpc" || schemaName == "urwell" || schemaName == "recoil" || schemaName == "flux" || schemaName == "crs") {
             return false;
         }
     }
