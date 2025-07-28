@@ -64,6 +64,9 @@ public:
 	hipo::schema rawEPICSSchema;
 	hipo::schema emptySchema;
 	
+    //M.S. BDX
+    hipo::schema bdxCRSSchema; 
+    
 	map<string, hipo::schema> schemasToLoad;
 	
 	// type: 0 = adc, 1 = tdc
