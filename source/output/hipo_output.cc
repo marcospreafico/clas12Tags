@@ -92,7 +92,7 @@ void hipo_output::recordSimConditions(outputContainer *output, map <string, stri
         bigData += b + string("\n");
     }
 
-    // file need to be opened after user configuration is added
+    // file need to be opened aer user configuration is added
     // output->hipoWriter->addUserConfig("GEMC::config",  bigData);
 
     output->initializeHipo(true);

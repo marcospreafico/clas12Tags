@@ -121,6 +121,7 @@ public:
 		{"atof",    24},
 		{"ahdc",    25},
 		{"recoil",  26},
+        {"crs",     99}, //M.S. BDX
 		{"flux",   100}
 	};
 

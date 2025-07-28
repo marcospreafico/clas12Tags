@@ -269,7 +269,7 @@ G4VParticleChange* G4MuonScalarProduction::PostStepDoIt(const G4Track& aTrack, c
 	  std::cout << "End extraction, could not find correct combination" << std::endl; 
 	}
 
-	//Just in case..
+	//Just in case
 	if (randomZ > 1) randomZ = 1;
 	if (randomZ < -1) randomZ = -1;
 	randomPhi = G4UniformRand()*twopi;
