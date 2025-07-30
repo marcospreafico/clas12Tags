@@ -44,14 +44,12 @@ print "CONFIGURATION IS ::: ",$configuration{"variation"},"\n";
 # Loading FT specific subroutines
 require "./hit.pl";
 require "./bank.pl";
-#require "./geometry_with_dump.pl";
 require "./geometry_dump.pl";
 require "./materials.pl";
 
 define_banks();
 define_bdx_hits();
 define_bdx_materials();
-make_hallA_bdx(); 
-make_detector_bdx();
+make_all();
     
     
