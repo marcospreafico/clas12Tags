@@ -1,0 +1,67 @@
+# Configuration file for BDX
+
+# Detector name and variation
+detector_name: bdx
+variation:     proposal
+
+# available variations:
+# proposal = 4 modules with crystals along the beam direction 
+# rotated = 4 modules with rotated crystals 
+
+#other variations
+# proposal = normal calorimeter
+# pbwo_core = core of pbwo crystal and csi around
+
+
+# Crystal parameters 
+crs:   CsI	      # crystals used
+# "available": BGO (L3), CsI (BaBar), PbWO4 (Panda)
+
+# Modular design
+modules  :		4		# a module is a block ECal + veto
+columns :  		10		# columns (cristals along x)
+rows : 			10		# rows (crystals along y)
+depth : 		2		# number of matrixes in the same module
+
+# design parameters for cristal perpendicular to beam axis
+vertical_crystals:  	0		# turn on vertical crystal orientation
+planes : 	    	10		# number of planes in a single module
+plane_side: 		10		# number of columns/rows per vertical plane
+
+# Design parameters (change only if necessary) -- all in cm
+cr_mylar : 	    0.005   	 # mylar thickness
+cr_air : 	    0.01	 # air gap around mylar
+cr_alv : 	    0.02	 # alveolus thickness
+alv_out_side: 	    7.0		 # external side of alveoli
+cap_tk: 	    2.5		 # thickness of 3d printed cap 
+
+crs_gap : 	    1 	 # gap between crystal
+veto_gap : 	    0.5		 # gap between two veto layers
+
+# Veto design
+paddle_max_width :		1000.0		# max side of plastic scintillator paddle
+pb_tk :		 		0.0 #2.0		# lead thickness
+iv_tk : 			1.0		# inner veto plastic thickness
+ov_tk : 			1.0		# outer veto plastic thickness
+
+# parameters for variation with pbwo core
+core_side :  	 	   	4		# side of pbwo core
+dep_csi   : 			2		# depth in number of csi crystals
+
+# Factory can be MYQL or TEXT
+factory:       TEXT
+
+# run ranges and variation will apply to geometry, materials and parameters
+rmin:       1
+rmax:       10000000
+
+# MYSQL server and databse if MYSQL factory is selected
+dbhost: clasdb.jlab.org
+
+# Comments/Description
+comment:       This is the first implementation of the Forward Tagger
+
+# Verbosity controls the perl script output
+verbosity: 0
+
+
