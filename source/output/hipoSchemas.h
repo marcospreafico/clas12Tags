@@ -65,7 +65,8 @@ public:
 	hipo::schema emptySchema;
 	
     //M.S. BDX
-    hipo::schema bdxCRSSchema; 
+    hipo::schema bdxCRSSchema;
+    hipo::schema bdxVETOSchema; 
     
 	map<string, hipo::schema> schemasToLoad;
 	

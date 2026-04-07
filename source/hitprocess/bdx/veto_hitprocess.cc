@@ -132,15 +132,14 @@ map<string, double> veto_HitProcess::integrateDgt(MHit* aHit, int hitn) {
             if(ADC[ii]<0) ADC[ii] = 0;
             TDC[ii] = time[ii]; // WARNING no time information here
             if(etot[ii] >0.001){
-//                cout << "Total energy on fiber " << ii << " is " << etot[ii] << endl;
-//                cout << "Corresponding number of phe on said fiber is " << pe[ii] << endl;
+                //                cout << "Total energy on fiber " << ii << " is " << etot[ii] << endl;
+                //                cout << "Corresponding number of phe on said fiber is " << pe[ii] << endl;
             }
         }
     }
     
     
     //if(sector == 0) cout << Etot << " " << Etot_B << " " << etot[0] << " " << etot[1] << " " << etot[2] << " " << etot[3] << endl;
-    
     dgtz["hitn"] = hitn;
     dgtz["sector"] = sector;
     dgtz["veto"] = veto_id;

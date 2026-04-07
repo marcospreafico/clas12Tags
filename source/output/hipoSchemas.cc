@@ -76,6 +76,7 @@ HipoSchema::HipoSchema() {
     
     //M.S. BDX
     bdxCRSSchema = hipo::schema("BDX::crs", 90000, 99);
+    bdxVETOSchema = hipo::schema("BDX::veto", 91000, 99);
 
     // Defining structure of the schema (bank)
     // The columns in the banks (or leafs, if you like ROOT)
@@ -162,6 +163,7 @@ HipoSchema::HipoSchema() {
     //I-integer, S-short, B-byte, F-float,
     //                   D-double, L-long
     bdxCRSSchema.parse("sector/B, layer/B, component/S, order/B, ADC/I, time/F, ped/S");
+    bdxVETOSchema.parse("sectorn/B, layer/B, component/S, order/B, ADC/I, time/F, ped/S"); //CHANGE!
 
     schemasToLoad["RUN::config"] = runConfigSchema;
     schemasToLoad["RUN::rf"] = runRFSchema;
@@ -211,7 +213,8 @@ HipoSchema::HipoSchema() {
     schemasToLoad["RECOIL::adc"]  = recoilADCSchema;
     
     //M.S. ADC
-    schemasToLoad["BDX::crs"] = bdxCRSSchema; 
+    schemasToLoad["BDX::crs"] = bdxCRSSchema;
+    schemasToLoad["BDX::veto"] = bdxVETOSchema;
 
     cout << " Done defining Hipo4 schemas." << endl;
 
@@ -241,7 +244,9 @@ hipo::schema HipoSchema::getSchema(string schemaName, int type) {
         return ftrkTDCSchema;
     } else if (schemaName == "crs"){
         return bdxCRSSchema;
-    } else{
+    } else if (schemaName == "veto"){
+        return bdxVETOSchema;
+    } else {
         if (non_registered_detectors(schemaName, type)) {
             cout << " SCHEMA " << schemaName << " " << " not found for type " << type << " = " << schemaType << endl;
         }
