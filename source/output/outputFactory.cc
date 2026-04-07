@@ -4,6 +4,7 @@
 #include "string_utilities.h"
 
 #include "hipo_output.h"
+#include "evio_output.h"
 #include "txt_output.h"
 #include "txt_simple_output.h"
 
@@ -30,7 +31,8 @@ outputFactory *getOutputFactory(map<string, outputFactoryInMap> *outputFactoryMa
 outputContainer::outputContainer(goptions Opts)
 {
 	
-	
+    // EVIO buffer size set to 30M words
+    int evio_buffer = EVIO_BUFFER;
 
 	gemcOpt = Opts;
 	string hd_msg  = gemcOpt.optMap["LOG_MSG"].args + " Output File: >> ";
@@ -50,6 +52,11 @@ outputContainer::outputContainer(goptions Opts)
 	if(outType == "hipo") {
 		initializeHipo(false);
 	}
+    
+    if(outType == "evio"){
+        pchan = new evioFileChannel(trimSpacesFromString(outFile).c_str(), "w", evio_buffer);
+        pchan->open(); 
+    }
 
 }
 
@@ -71,6 +78,10 @@ outputContainer::~outputContainer()
 		cout << hd_msg << " Closing Hipo file \"" << trimSpacesFromString(outFile) << "\"." << endl;
 		hipoWriter->close();
 	}
+    if(outType == "evio"){
+        pchan->close();
+        delete pchan;
+    }
 
 }
 
@@ -81,7 +92,7 @@ map<string, outputFactoryInMap> registerOutputFactories()
 
 	outputMap["txt"]        = &txt_output::createOutput;
 	outputMap["txt_simple"] = &txt_simple_output::createOutput;
-	
+    outputMap["evio"]       = &evio_output::createOutput;
 	outputMap["hipo"]       = &hipo_output::createOutput;
 
 	return outputMap;
