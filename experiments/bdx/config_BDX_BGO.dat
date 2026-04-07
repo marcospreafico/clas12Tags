@@ -6,14 +6,14 @@ variation:     proposal
 
 # Crystal parameters 
 crs:   BGO	      # crystals used 
-PRad:  1	      # enable PRad crystals
-PANDA: 1 	      # enable PANDA crystals
+PRad:  0	      # enable PRad crystals
+PANDA: 0 	      # enable PANDA crystals
 
 # Design parameters (change only if necessary) -- all in cm
 cr_mylar : 	    0.005   	 # mylar thickness
 cr_air : 	    0.01	 # air gap around mylar
 cr_alv : 	    0.02	 # alveolus thickness
-alv_out_side: 	    7.0		 # external side of alveoli
+salv_out_side: 	    7.0		 # external side of alveoli
 cap_tk: 	    2.5		 # thickness of 3d printed cap 
 
 crs_gap : 	    1 	 # gap between crystal
