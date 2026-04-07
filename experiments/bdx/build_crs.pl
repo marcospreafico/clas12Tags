@@ -45,7 +45,7 @@ print "CONFIGURATION IS ::: ",$configuration{"variation"},"\n";
 require "./hit.pl";
 require "./bank.pl";
 #require "./geometry_with_dump.pl";
-require "./geometry_BGO.pl";
+require "./geometry_crs.pl";
 require "./materials.pl";
 
 define_banks();
