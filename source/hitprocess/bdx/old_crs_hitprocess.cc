@@ -30,11 +30,13 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     // Parameter for Crs
     // Babar Crs                        PANDA crystals                      L3 crystals
     map<string, double> light_yield_db = {{"CsI_Tl", 50000 * (1. / MeV)}, {"G4_PbWO4", 310 * (1. / MeV)}, {"G4_BGO", 8000 * (1. / MeV)}};
-    map<string, double> attenuation_lenght_db = {{"CsI_Tl", 30 * cm},     {"G4_PbWO4", 60000 * cm},       {"G4_BGO", 150 * cm}};
+    //map<string, double> light_yield_db = {{"CsI_Tl", 700 * (1. / MeV)}, {"G4_PbWO4", 310 * (1. / MeV)}, {"G4_BGO", 8000 * (1. / MeV)}};// TMP
+    map<string, double> attenuation_lenght_db = {{"CsI_Tl", 30 * cm},     {"G4_PbWO4", 60000 * cm},       {"G4_BGO", 25 * cm}};
     map<string, double> optical_coupling_db = {{"CsI_Tl", 0.6866},        {"G4_PbWO4", 0.9},              {"G4_BGO", 0.7}};
     
     double optical_coupling = optical_coupling_db[crs_material];
     double light_yield_crs = light_yield_db[crs_material];
+    light_yield_crs = 600*(1./MeV);
     double att_length_crs = attenuation_lenght_db[crs_material]; // compatible with NO ATT Lenght as measured for cosmic muons
     double veff_crs = 30 / 1.8 * cm / ns;                     // light velocity in crystal
     
@@ -50,35 +52,39 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     // set parameters for specific crystals
     double readout_surface_crs = 0.;
     double length_crs = 0.;
-    double readout_pos = 0;
     if(aHit->GetDetector().type == "Box"){
         double sside_crs = 2 * aHit->GetDetector().dimensions[0];
         double lside_crs = 2 * aHit->GetDetector().dimensions[1];
         readout_surface_crs = sside_crs * lside_crs * mm * mm;
-        length_crs = 2*aHit->GetDetector().dimensions[2];
-        readout_pos = -length_crs/2;
-    }else if(aHit->GetDetector().type == "Trd"){ // if trd readout on larger face
-        double sside_crs = 2 * std::max(aHit->GetDetector().dimensions[0], aHit->GetDetector().dimensions[1]);
-        double lside_crs = 2 * std::max(aHit->GetDetector().dimensions[2], aHit->GetDetector().dimensions[3]);
+        length_crs = aHit->GetDetector().dimensions[2];
+    }else if(aHit->GetDetector().type == "Trd"){
+        double sside_crs = 2 * aHit->GetDetector().dimensions[0];
+        double lside_crs = 2 * aHit->GetDetector().dimensions[2];
         readout_surface_crs = sside_crs * lside_crs * mm * mm;
-        length_crs = 2*aHit->GetDetector().dimensions[4];
-        if(aHit->GetDetector().dimensions[0] > aHit->GetDetector().dimensions[1]) readout_pos = length_crs/2;
-        else readout_pos = -length_crs/2;
+        length_crs = aHit->GetDetector().dimensions[4];
     }
+    
+    
+    // matching readout surface to crystal parameters
     
     double light_coll_crs = sensor_surface_crs / readout_surface_crs;
     if (light_coll_crs > 1) light_coll_crs = 1.;
     
-    double etot_crs = 0;
-    double time_crs = 0;
+    double etotL_crs = 0; //L= Large side redout
+    double etotR_crs = 0; //R= short side redout
+    
+    double timeL_crs = 0;
+    double timeR_crs = 0;
     
     double tdc_conv_crs = 1. / ns;               // TDC conversion factor
     double T_offset_crs = 0 * ns;
     
-    double ADC_crs = 0;
-    double TDC_crs = 4096;
+    double ADCL_crs = 0;
+    double ADCR_crs = 0;
+    double TDCL_crs = 4096;
+    double TDCR_crs = 4096;
     
-    double TDCB = 4096; // no idea what's this
+    double TDCB = 4096;
     
     // Get info about detector material to eveluate Birks effect
     double birks_constant = aHit->GetDetector().GetLogical()->GetMaterial()->GetIonisation()->GetBirksConstant();
@@ -91,7 +97,6 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
         birks_constant = 10.5e-3;
     }else if(crs_material == "G4_BGO"){
         // Here the paper does not provide a value for BGO
-        birks_constant = 0;
     }
     
     double time_min_crs[4] = { 0, 0, 0, 0 };
@@ -111,8 +116,11 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     double* test;
     double tim;
     
-    double pe_int_crs = 0;
-    double pe_crs = 0.;
+    double peR_int_crs = 0;
+    double peR_crs = 0.;
+    
+    double peL_int_crs = 0;
+    double peL_crs = 0.;
     
     int Nsamp_int = 500; // 2 us (BDX proto) time window
     // here you can change integration time depending on the material
@@ -127,55 +135,80 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
         Etot = Etot + Edep[s];
     }
     
-    double effective_ly = 40; // effective LY to skip all the constants
-    // Effectively each side sees 20 phe, but here i start from the whole
-    // energy deposition
-    
+    double effective_ly = 20;
     double Etot_B= 0;
     
     if (Etot > 0) {
-        for (unsigned int s = 0; s < nsteps; s++) {
+        for (unsigned int s = 0; s < nsteps; s++) {   //Reference vie for cal matrix:
+            //cristals with short size pointing downstream
+            // sipm attached to the large side (upstream)
+            // left: smoll size, right: large size
+            // Use only dRight
+            // for rotated (old) crystal we keep the same convention:
+            // readout = small size (use dLeft)
+            
             double Edep_B = BirksAttenuation(Edep[s], Dx[s], charge[s], birks_constant);
+            
             Etot_B += Edep_B;
             
-            double d_crs = fabs(readout_pos / 2 - Lpos[s].z());
+            double dLeft_crs = length_crs / 2 + Lpos[s].z();            //Downstream (SIPM position )
+            double dRight_crs = length_crs / 2 - Lpos[s].z();            //Upstream
             
             // evaluate total energy and time for left readout
-            etot_crs += Edep_B/2 * exp(-d_crs / att_length_crs);
-            // WARNING: here there was a division for a factor 2 to account for half light going to each side
-            time_crs += (times[s] + d_crs / veff_crs) / nsteps;
-            if (etot_crs > 0.) {
-                if (s == 0 || (time_min_crs[0] > (times[s] + d_crs / veff_crs))) time_min_crs[0] = times[s] + d_crs / veff_crs;
+            etotL_crs += Edep_B / 2 * exp(-dLeft_crs / att_length_crs);
+            timeL_crs += (times[s] + dLeft_crs / veff_crs) / nsteps;
+            if (etotL_crs > 0.) {
+                if (s == 0 || (time_min_crs[0] > (times[s] + dLeft_crs / veff_crs))) time_min_crs[0] = times[s] + dLeft_crs / veff_crs;
             }
+            
+            
+            // evaluate total energy and time for right readout
+            etotR_crs += Edep_B / 2 * exp(-dRight_crs / att_length_crs);
+            timeR_crs += (times[s] + dRight_crs / veff_crs) / nsteps;
+            if (etotR_crs > 0.) {
+                if (s == 0 || (time_min_crs[1] > (times[s] + dRight_crs / veff_crs))) time_min_crs[1] = times[s] + dRight_crs / veff_crs;
+            }
+            
         }
         
-        //cout << Etot << " " << etot_crs << endl;
+        //      Right readout
+        peR_crs = int(etotR_crs * light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs);
+        //cout << peR_crs << endl;
+        peR_crs = G4Poisson(peR_crs);
         
-        // Evaluate number of phe measured
-        pe_crs = int(etot_crs*effective_ly); //int(etot_crs * light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs);
-        //pe_crs = G4Poisson(pe_crs); // To be suppressed when using WF as the extraction is handled by the WF function
+        //WARNING
+        /*test = WaveForm(peR_crs, &tim, crs_material);
+         
+         TGraph* WF_new = new TGraph();
+         for(int s = 0; s < Nsamp_int; s++){
+         WF_new->SetPoint(s, s, test[s]);
+         }
+         
+         TFile* fout = new TFile("testWF.root", "RECREATE");
+         fout->cd();
+         WF_new->Write(); fout->Write(); fout->Close();*/
         
-        /*test = WaveForm(pe_crs, &tim, crs_material);
-        for(unsigned int s = 0; s < Nsamp_int; s++){
-            pe_int_crs += test[s];
-        }*/
-        pe_int_crs = pe_crs;
+        //        double peR_int_crs_old = 0;
+        //		for (unsigned int s = 0; s < Nsamp_int; s++) {
+        //			peR_int_crs += test[s];
+        //		}
         
-        // ONLY FOR DEBUGGING
-        /*
-        TGraph* wf = new TGraph();
-        for(int s = 0, s < Nsamp_int, s++){
-            wf->SetPoint(s, s, test[s]);
-        }
-        TFile* fout = new TFile("test_wf.root", "recreate");
-        fout->cd();
-        wf->Write(); fout->Write(); fout->Close();
-        */
-       
-        //pe_int_crs = pe_crs;
+        //      Left readout
+        peL_crs = int(etotL_crs * effective_ly); //light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs);
+        peL_crs = G4Poisson(peL_crs);
+        //        test = WaveForm(peL_crs, &tim, crs_material);
+        //
+        //        for (unsigned int s = 0; s < Nsamp_int; s++) {
+        //            peL_int_crs = peL_int_crs + test[s];
+        //        }
         
+        peL_int_crs = peL_crs;
+        peR_int_crs = peR_crs;
         
-        // This variable corrects for the integration window used
+        // Save variables
+        
+        // Correct readout to be in energy;
+        // This variable keeps track of the fraction of energy measured in the integration window and corrects for it
         //        double  ts =  0.680, fs =  0.64, tl =  3.34, fl = 0.36; // fraction of long /short time; value of long/short time
         //        if(crs_material == "G4_PbWO4"){
         //            ts = 0.00680; fs= 0.64; tl = 0.0334; fl =  0.36;
@@ -185,50 +218,51 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
         //        double digiframe =  Nsamp_int * 4. / 1000.;
         //        double sigfrac = 1 - (fs* exp(-digiframe / ts) + fl * exp(-digiframe / tl)); // fraction of signal contained in a digiframe digitalization window
         
-        // Measure energy from effective LY
-        ADC_crs = 1.*(pe_int_crs)/effective_ly;
-        //additioanl gaussian spread for no reason now
-        //(light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs * 0.5); // * sigfrac); // in MeV
-        // NOTE: factor 2 takes into account that light is considered evenly split between the two faces of the crystal;
+        // energy measured = numbrer of phe / (light yield * attenuation * light was 2x before splitting * fraction measured in a fixed time window
+        ADCR_crs = (peR_int_crs)/effective_ly; //(light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs * 0.5); // * sigfrac); // in MeV
+        ADCL_crs = (peL_int_crs)/effective_ly; //(light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs * 0.5); // * sigfrac);
         
-        // DEBUGGING - save energy deposited in file
+        
         ofstream ofile("edep.txt", std::ios::app);
-        if(crs_material == "G4_BGO") ofile << pe_crs << " " << pe_int_crs << Etot << " " << etot_crs << endl;//ofile << etot_crs << endl; //ADCL_crs << endl;
+        if(crs_material == "G4_BGO") ofile << etotL_crs << endl; //ADCL_crs << endl;
         //cout << etotL_crs << endl;
         ofile.close();
         
         //cout << peL_crs << " " << peL_int_crs/sigfrac << " ( was " << peL_int_crs << ")" << endl;
         
-        TDC_crs = int(tim) + ((time_min_crs[1] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs);
+        TDCR_crs = int(tim) + ((time_min_crs[1] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs);
+        TDCL_crs = int(tim) + ((time_min_crs[0] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs); // assigning to L the sipm2
         
         //Assigning to TDCB the usual timing seen by sipm1 (TDCR)
         TDCB = ((time_min_crs[1] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs);
+        
+        // overwrite right readout
+        TDCR_crs = TDCL_crs;
+        ADCR_crs = ADCL_crs;
     }
     // closes (Etot > 0) loop
     
     if (verbosity > 4) {
         cout << log_msg << " xch: " << xch << ", ych: " << ych;
         cout << log_msg << " Etot=" << Etot / MeV << endl;
-        cout << log_msg << " TDCL=" << TDC_crs << " TDCR=" << TDC_crs << " ADCL=" << ADC_crs << " ADCR=" << ADC_crs << endl;
+        cout << log_msg << " TDCL=" << TDCL_crs << " TDCR=" << TDCR_crs << " ADCL=" << ADCL_crs << " ADCR=" << ADCR_crs << endl;
         //cout <<  log_msg << " TDCB=" << TDCB     << " TDCF=" << TDCF    << " ADCB=" << ADCB << " ADCF=" << ADCF << endl;
     }
-    
-    //WARNING: tdc changed
     dgtz["hitn"]      = hitn;
     dgtz["sector"]    = sector;
     dgtz["layer"]     = zch;
     dgtz["component"] = xch+100*ych;
     dgtz["ADC_order"] = 0;
-    dgtz["ADC_ADC"]   = 1000*ADC_crs; //output = energy in keV
-    dgtz["ADC_time"]  = 1000*Etot_B; //TDC_crs;
+    dgtz["ADC_ADC"]   = ADCL_crs;
+    dgtz["ADC_time"]  = TDCL_crs;
     dgtz["ADC_ped"]   = 0;
     
-//    	dgtz["adcl"] = ADC_crs;	  //
-//    	dgtz["adcr"] = ADC_crs;	  //SIPM 25um -> large size for matrix, small size for single
-//    	dgtz["tdcl"] = TDC_crs;	  //
-//    	dgtz["tdcr"] = TDC_crs;	  // as per ADCR_crs
+//    	dgtz["adcl"] = ADCL_crs;	  //
+//    	dgtz["adcr"] = ADCR_crs;	  //SIPM 25um -> large size for matrix, small size for single
+//    	dgtz["tdcl"] = TDCL_crs;	  //
+//    	dgtz["tdcr"] = TDCR_crs;	  // as per ADCR_crs
 //    	dgtz["adcb"] = Etot_B * 1000;  // deposited energy with Birks
-//    	dgtz["adcf"] = ADC_crs * 1000000;
+//    	dgtz["adcf"] = ADCL_crs * 1000000;
 //    	dgtz["tdcb"] = TDCB * 1000.;	  //original time in ps
 //    	dgtz["tdcf"] = Etot*1000000;
     	return dgtz;
@@ -286,8 +320,6 @@ double* crs_HitProcess::WaveForm(double npe, double* time, string crs_material){
     }
     else if(crs_material == "CsI_Tl"){
         p = { 0., 0.680, 0.64, 3.34, 0.36, 0. }; // BaBar CsI
-    } else if(crs_material == "G4_BGO"){
-        p = { 0., 0.060, 0.10, 0.230, 0.90, 0. }; // PbWO4
     }
     else{
         cout << "ERROR: no waveform parametrization for this material ( "+crs_material+" )" << endl;

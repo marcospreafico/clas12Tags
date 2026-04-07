@@ -354,7 +354,7 @@ void evio_output :: initBank(outputContainer* output, gBank thisHitBank, int wha
 		*detectorBank << detectorRawIntBank[thisHitBank.bankName];
 		insideRawIntBank[thisHitBank.bankName] = 1;
 	}
-
+    
 	// digitized information
 	if(!insideDgtIntBank[thisHitBank.bankName] && what == DGTINT_ID) {
 		detectorDgtIntBank[thisHitBank.bankName] = evioDOMNode::createEvioDOMNode(thisHitBank.idtag + DGTINT_ID, 0);
