@@ -18,6 +18,7 @@
 	
 <!--<option name="OUTPUT" value="evio, out_flux_mu.evio"/>-->
 <!--		<option name="PRINT_EVENT"   value="1" />-->
+<!--  <option name="N" value="100"--> -->
 
 <!--<option name="BEAM_P"   value="mu-,4*GeV, 0*deg, 0*deg"/>-->
 <!--<option name="SPREAD_P" value="100*MeV, 10*deg, 10*deg"/>-->
