@@ -141,7 +141,7 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
             double d_crs = fabs(readout_pos / 2 - Lpos[s].z());
             
             // evaluate total energy and time for left readout
-            etot_crs += Edep_B/2 * exp(-d_crs / att_length_crs);
+            etot_crs += Edep_B * exp(-d_crs / att_length_crs);
             // WARNING: here there was a division for a factor 2 to account for half light going to each side
             time_crs += (times[s] + d_crs / veff_crs) / nsteps;
             if (etot_crs > 0.) {

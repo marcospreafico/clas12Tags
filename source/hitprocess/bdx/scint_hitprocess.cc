@@ -20,219 +20,87 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     map<string, double> dgtz;
     vector<identifier> identity = aHit->GetId();
     
-    int sector = identity[0].id;    //module
-    int xch = identity[1].id;       //coordinates in the module
-    int ych = identity[2].id;
-    int zch = identity[3].id;
-    int SiPM = identity[4].id;
-    string crs_material = aHit->GetDetector().GetLogical()->GetMaterial()->GetName();
-    
-    // Parameter for Crs
-    // Babar Crs                        PANDA crystals                      L3 crystals
-    map<string, double> light_yield_db = {{"CsI_Tl", 50000 * (1. / MeV)}, {"G4_PbWO4", 310 * (1. / MeV)}, {"G4_BGO", 8000 * (1. / MeV)}};
-    map<string, double> attenuation_lenght_db = {{"CsI_Tl", 30 * cm},     {"G4_PbWO4", 60000 * cm},       {"G4_BGO", 150 * cm}};
-    map<string, double> optical_coupling_db = {{"CsI_Tl", 0.6866},        {"G4_PbWO4", 0.9},              {"G4_BGO", 0.7}};
-    
-    double optical_coupling = optical_coupling_db[crs_material];
-    double light_yield_crs = light_yield_db[crs_material];
-    double att_length_crs = attenuation_lenght_db[crs_material]; // compatible with NO ATT Lenght as measured for cosmic muons
-    double veff_crs = 30 / 1.8 * cm / ns;                     // light velocity in crystal
-    
-    //parameters of SiPM
-    int sipm_size = SiPM/100;
-    int sipm_cell = SiPM - sipm_size * 100;
-    
-    double sensor_surface_crs = pow(0.1 * sipm_size * cm, 2);
-    
-    map<int, double> sipm_pde = {{25, 0.22}, {50, 0.35}, {75, 0.5}}; // 25 and 50 from old code; 75 from hamamatsu datasheet
-    double sensor_qe_crs = sipm_pde[sipm_cell]; // 24% sipm 100um 22% sipm 25um 35% sipm 50um
-    
-    // set parameters for specific crystals
-    double readout_surface_crs = 0.;
-    double length_crs = 0.;
-    double readout_pos = 0;
-    if(aHit->GetDetector().type == "Box"){
-        double sside_crs = 2 * aHit->GetDetector().dimensions[0];
-        double lside_crs = 2 * aHit->GetDetector().dimensions[1];
-        readout_surface_crs = sside_crs * lside_crs * mm * mm;
-        length_crs = 2*aHit->GetDetector().dimensions[2];
-        readout_pos = -length_crs/2;
-    }else if(aHit->GetDetector().type == "Trd"){ // if trd readout on larger face
-        double sside_crs = 2 * std::max(aHit->GetDetector().dimensions[0], aHit->GetDetector().dimensions[1]);
-        double lside_crs = 2 * std::max(aHit->GetDetector().dimensions[2], aHit->GetDetector().dimensions[3]);
-        readout_surface_crs = sside_crs * lside_crs * mm * mm;
-        length_crs = 2*aHit->GetDetector().dimensions[4];
-        if(aHit->GetDetector().dimensions[0] > aHit->GetDetector().dimensions[1]) readout_pos = length_crs/2;
-        else readout_pos = -length_crs/2;
-    }
-    
-    double light_coll_crs = sensor_surface_crs / readout_surface_crs;
-    if (light_coll_crs > 1) light_coll_crs = 1.;
-    
-    double etot_crs = 0;
-    double time_crs = 0;
-    
-    double tdc_conv_crs = 1. / ns;               // TDC conversion factor
-    double T_offset_crs = 0 * ns;
-    
-    double ADC_crs = 0;
-    double TDC_crs = 4096;
-    
-    double TDCB = 4096; // no idea what's this
-    
-    // Get info about detector material to eveluate Birks effect
+    int sector = identity[0].id;    // module
+    int channel    = identity[1].id;
+    int module    = identity[2].id;
+
+    // Parameters for plastic scintillator
+    double light_yield       = 9200;            // photons / MeV
+    double attenuation_length = 100 * cm;       // attenuation length in plastic
+    double veff              = 13 * cm / ns;    // effective velocity of light
+    double sipm_pde          = 0.5;             // SiPM photon detection efficiency
+
+    // Dimensions of plastic scintillator
+    double dx = aHit->GetDetector().dimensions[0] * 2; // full width  (x)
+    double dy = aHit->GetDetector().dimensions[1] * 2; // full height (y)
+    double dz = aHit->GetDetector().dimensions[2] * 2; // full length (z) - readout axis
+
+    double z_readout = dz / 2.; // readout at one end of the scintillator
+
+    // Extract Birks constant from material properties
     double birks_constant = aHit->GetDetector().GetLogical()->GetMaterial()->GetIonisation()->GetBirksConstant();
     
-    // forcing Birks for CsI(Tl) from arxiv.org/pdf/0911.3041 and checked with alpha
-    // birks_constant=3.2e-3 best at  8e-3
-    if(crs_material == "CsI_Tl"){
-        birks_constant = 3.2e-3; // g / MeV / cm^2
-    }else if(crs_material == "G4_PbWO4"){
-        birks_constant = 10.5e-3;
-    }else if(crs_material == "G4_BGO"){
-        // Here the paper does not provide a value for BGO
-        birks_constant = 0;
-    }
-    
-    double time_min_crs[4] = { 0, 0, 0, 0 };
-    
-    vector<G4ThreeVector> Lpos = aHit->GetLPos();
-    vector<G4double> Edep = aHit->GetEdep();
-    vector<G4double> Dx = aHit->GetDx();
-    
-    // Charge for each step
-    vector<int> charge = aHit->GetCharges();
-    vector<G4double> times = aHit->GetTime();
-    
+    // Get hit information
+    vector<G4ThreeVector> Lpos  = aHit->GetLPos();   // local positions of steps
+    vector<G4double>      Edep  = aHit->GetEdep();   // energy deposited per step
+    vector<G4double>      Dx    = aHit->GetDx();     // step lengths
+    vector<int>           charge = aHit->GetCharges(); // particle charge per step
+    vector<G4double>      times  = aHit->GetTime();  // time per step
+
     unsigned int nsteps = Edep.size();
-    
+
+    // Sum total energy deposit
     double Etot = 0;
-    
-    double* test;
-    double tim;
-    
-    double pe_int_crs = 0;
-    double pe_crs = 0.;
-    
-    int Nsamp_int = 500; // 2 us (BDX proto) time window
-    // here you can change integration time depending on the material
-    if(crs_material == "CsI_Tl"){
-        Nsamp_int = 500;
-    }else if(crs_material == "G4_PbWO4"){
-        Nsamp_int = 500;
-    }
-    double sigmaTR_crs = 0.; //??
-    
-    for (unsigned int s = 0; s < nsteps; s++) {
-        Etot = Etot + Edep[s];
-    }
-    
-    double effective_ly = 40; // effective LY to skip all the constants
-    // Effectively each side sees 20 phe, but here i start from the whole
-    // energy deposition
-    
-    double Etot_B= 0;
-    
+    for (unsigned int s = 0; s < nsteps; s++) Etot += Edep[s];
+
+    double Etot_B  = 0;   // Birks-attenuated total energy
+    double etot    = 0;   // light collected at readout after attenuation
+    double time_hit = 0;  // average hit time at readout
+    double ADC_scint = 0;
+    double TDC     = 4096; // non capisco bene cosa e il TDC?
+
+    double eff_ly = 40; // effective LY ???? is different to light_yield by such a big factor? 
+
     if (Etot > 0) {
         for (unsigned int s = 0; s < nsteps; s++) {
+            
+            // Apply Birks attenuation
             double Edep_B = BirksAttenuation(Edep[s], Dx[s], charge[s], birks_constant);
             Etot_B += Edep_B;
-            
-            double d_crs = fabs(readout_pos / 2 - Lpos[s].z());
-            
-            // evaluate total energy and time for left readout
-            etot_crs += Edep_B/2 * exp(-d_crs / att_length_crs);
-            // WARNING: here there was a division for a factor 2 to account for half light going to each side
-            time_crs += (times[s] + d_crs / veff_crs) / nsteps;
-            if (etot_crs > 0.) {
-                if (s == 0 || (time_min_crs[0] > (times[s] + d_crs / veff_crs))) time_min_crs[0] = times[s] + d_crs / veff_crs;
-            }
+
+            // Distance from hit position to readout along z
+            double zhit = Lpos[s].z();
+            double dist = fabs(zhit - z_readout);
+
+            // Light collected: attenuated by propagation to readout
+            etot     += Edep_B * exp(-dist / attenuation_length);
+
+            // Time: hit time + propagation time to readout
+            time_hit += (times[s] + dist / veff) / nsteps;
         }
-        
-        //cout << Etot << " " << etot_crs << endl;
-        
-        // Evaluate number of phe measured
-        pe_crs = int(etot_crs*effective_ly); //int(etot_crs * light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs);
-        //pe_crs = G4Poisson(pe_crs); // To be suppressed when using WF as the extraction is handled by the WF function
-        
-        /*test = WaveForm(pe_crs, &tim, crs_material);
-        for(unsigned int s = 0; s < Nsamp_int; s++){
-            pe_int_crs += test[s];
-        }*/
-        pe_int_crs = pe_crs;
-        
-        // ONLY FOR DEBUGGING
-        /*
-        TGraph* wf = new TGraph();
-        for(int s = 0, s < Nsamp_int, s++){
-            wf->SetPoint(s, s, test[s]);
-        }
-        TFile* fout = new TFile("test_wf.root", "recreate");
-        fout->cd();
-        wf->Write(); fout->Write(); fout->Close();
-        */
-       
-        //pe_int_crs = pe_crs;
-        
-        
-        // This variable corrects for the integration window used
-        //        double  ts =  0.680, fs =  0.64, tl =  3.34, fl = 0.36; // fraction of long /short time; value of long/short time
-        //        if(crs_material == "G4_PbWO4"){
-        //            ts = 0.00680; fs= 0.64; tl = 0.0334; fl =  0.36;
-        //        } else if(crs_material == "CsI_Tl"){
-        //            ts =  0.680; fs =  0.64; tl =  3.34; fl = 0.36;
-        //        }
-        //        double digiframe =  Nsamp_int * 4. / 1000.;
-        //        double sigfrac = 1 - (fs* exp(-digiframe / ts) + fl * exp(-digiframe / tl)); // fraction of signal contained in a digiframe digitalization window
-        
-        // Measure energy from effective LY
-        ADC_crs = 1.*(pe_int_crs)/effective_ly;
-        //additioanl gaussian spread for no reason now
-        //(light_yield_crs * sensor_qe_crs * optical_coupling * light_coll_crs * 0.5); // * sigfrac); // in MeV
-        // NOTE: factor 2 takes into account that light is considered evenly split between the two faces of the crystal;
-        
-        // DEBUGGING - save energy deposited in file
-        ofstream ofile("edep.txt", std::ios::app);
-        if(crs_material == "G4_BGO") ofile << pe_crs << " " << pe_int_crs << Etot << " " << etot_crs << endl;//ofile << etot_crs << endl; //ADCL_crs << endl;
-        //cout << etotL_crs << endl;
-        ofile.close();
-        
-        //cout << peL_crs << " " << peL_int_crs/sigfrac << " ( was " << peL_int_crs << ")" << endl;
-        
-        TDC_crs = int(tim) + ((time_min_crs[1] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs);
-        
-        //Assigning to TDCB the usual timing seen by sipm1 (TDCR)
-        TDCB = ((time_min_crs[1] + T_offset_crs + G4RandGauss::shoot(0., sigmaTR_crs)) * tdc_conv_crs);
+
+        // Convert energy to photoelectrons
+        double npe = etot * eff_ly;  // number of detected photoelectrons 
+        //(devo anche fare int()?)
+
+        // ADC: energy from effective LY
+        ADC_scint = npe;
+        if (ADC_scint < 0) ADC_scint = 0;
+        TDC = time_hit;
     }
-    // closes (Etot > 0) loop
-    
-    if (verbosity > 4) {
-        cout << log_msg << " xch: " << xch << ", ych: " << ych;
-        cout << log_msg << " Etot=" << Etot / MeV << endl;
-        cout << log_msg << " TDCL=" << TDC_crs << " TDCR=" << TDC_crs << " ADCL=" << ADC_crs << " ADCR=" << ADC_crs << endl;
-        //cout <<  log_msg << " TDCB=" << TDCB     << " TDCF=" << TDCF    << " ADCB=" << ADCB << " ADCF=" << ADCF << endl;
-    }
-    
-    //WARNING: tdc changed
+
     dgtz["hitn"]      = hitn;
     dgtz["sector"]    = sector;
-    dgtz["layer"]     = zch;
-    dgtz["component"] = xch+100*ych;
+    dgtz["layer"]     = channel;
+    dgtz["component"] = module;
     dgtz["ADC_order"] = 0;
-    dgtz["ADC_ADC"]   = 1000*ADC_crs; //output = energy in keV
-    dgtz["ADC_time"]  = 1000*Etot_B; //TDC_crs;
+    dgtz["ADC_ADC"]   = 1000 * ADC_scint;     // number of photoelectrons
+    dgtz["ADC_time"]  = 1000 * Etot_B;       
     dgtz["ADC_ped"]   = 0;
-    
-//    	dgtz["adcl"] = ADC_crs;	  //
-//    	dgtz["adcr"] = ADC_crs;	  //SIPM 25um -> large size for matrix, small size for single
-//    	dgtz["tdcl"] = TDC_crs;	  //
-//    	dgtz["tdcr"] = TDC_crs;	  // as per ADCR_crs
-//    	dgtz["adcb"] = Etot_B * 1000;  // deposited energy with Birks
-//    	dgtz["adcf"] = ADC_crs * 1000000;
-//    	dgtz["tdcb"] = TDCB * 1000.;	  //original time in ps
-//    	dgtz["tdcf"] = Etot*1000000;
-    	return dgtz;
+
+    return dgtz;
 }
+
 
 vector<identifier> scint_HitProcess::processID(vector<identifier> id, G4Step *step, detector Detector) {
 	id[id.size() - 1].id_sharing = 1;
