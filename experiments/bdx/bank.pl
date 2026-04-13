@@ -80,8 +80,6 @@ sub define_bdx_bank
     insert_bank_variable(\%configuration, $bankname, "ADC_order",         6, "Di", "energy measured (keV)");
     insert_bank_variable(\%configuration, $bankname, "ADC_time",         7, "Di", "time");
     insert_bank_variable(\%configuration, $bankname, "ADC_ped",         8, "Di", "pedestal");
-
-
 }
 
 
