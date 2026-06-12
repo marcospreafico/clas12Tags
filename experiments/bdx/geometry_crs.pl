@@ -264,7 +264,7 @@ sub make_bgo_crs{
     $detector{"sensitivity"} = "crs";
     $detector{"hit_type"}    = "crs";
     $detector{"identifiers"} = "sector manual 0 xch manual 0 ych manual 1 zch manual 0 SiPM manual 6025";
-    print_det(\%configuration, \%detector);
+    #print_det(\%configuration, \%detector);
     
     $Y = $Y-+($L+$d)*sin($theta * pi /180.0);
     $Z = $Z-($L+$d)*cos($theta* pi / 180.0);
@@ -281,7 +281,7 @@ sub make_bgo_crs{
     $detector{"rotation"}    = "$theta*deg 0*deg 0*deg";
     $detector{"dimensions"}  = "$B*cm $H*cm $d*cm";
     $detector{"material"}    = "G4_Al";
-    print_det(\%configuration, \%detector);
+    #print_det(\%configuration, \%detector);
     
     %detector = init_det();
     $detector{"name"}        = "cap_hole_crs1_$ix"."_"."$iy"."_"."$iz";
@@ -295,7 +295,7 @@ sub make_bgo_crs{
     $detector{"rotation"}    = "0*deg 0*deg 0*deg";
     $detector{"dimensions"}  = "0*cm 2*cm $d*cm 0*deg 360*deg";
     $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
+    #print_det(\%configuration, \%detector);
     
 }
 
@@ -327,13 +327,13 @@ sub make_detector{
     $detector{"style"}       = 1;
     $detector{"visible"}     = 1;
     $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm 8*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
+    $detector{"pos"}         = "0*cm 6*cm 10*cm";
+    $detector{"rotation"}    = "0*deg 90*deg 0*deg";
     $detector{"dimensions"}  = "1*cm 0.25*cm 10*cm";
     $detector{"material"}    = "ScintillatorB";
-    $detector{"sensitivity"} = "veto";
-    $detector{"hit_type"}    = "veto";
-    $detector{"identifiers"} = "sector manual 0 veto manual 0 channel manual 0 module manual 0";
+    $detector{"sensitivity"} = "scint";
+    $detector{"hit_type"}    = "scint";
+    $detector{"identifiers"} = "sector manual 0 scint manual 0 channel manual 0 module manual 0";
     print_det(\%configuration, \%detector);
     
     make_bgo_crs("3", 0, 0, 0);
@@ -346,13 +346,13 @@ sub make_detector{
     $detector{"style"}       = 1;
     $detector{"visible"}     = 1;
     $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm -8*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "3.25*cm 0.25*cm 15*cm";
+    $detector{"pos"}         = "0*cm -7*cm 10*cm";
+    $detector{"rotation"}    = "0*deg 90*deg 0*deg";
+    $detector{"dimensions"}  = "1*cm 0.25*cm 10*cm";
     $detector{"material"}    = "ScintillatorB";
-    $detector{"sensitivity"} = "veto";
-    $detector{"hit_type"}    = "veto";
-    $detector{"identifiers"} = "sector manual 0 veto manual 0 channel manual 1 module manual 0";
+    $detector{"sensitivity"} = "scint";
+    $detector{"hit_type"}    = "scint";
+    $detector{"identifiers"} = "sector manual 0 scint manual 0 channel manual 1 module manual 0";
     print_det(\%configuration, \%detector);
 }
 

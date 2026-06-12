@@ -57,9 +57,9 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     double etot    = 0;   // light collected at readout after attenuation
     double time_hit = 0;  // average hit time at readout
     double ADC_scint = 0;
-    double TDC     = 4096; // non capisco bene cosa e il TDC?
+    double TDC     = 4096; 
 
-    double eff_ly = 40; // effective LY ???? is different to light_yield by such a big factor? 
+    double eff_ly = 22.04; // effective LY ???? is different to light_yield by such a big factor? 
 
     if (Etot > 0) {
         for (unsigned int s = 0; s < nsteps; s++) {
@@ -81,7 +81,15 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
 
         // Convert energy to photoelectrons
         double npe = etot * eff_ly;  // number of detected photoelectrons 
-        //(devo anche fare int()?)
+
+        // Apply Poisson fluctuations to the number of photoelectrons (Ask M. Spreafico if this is needed when using WF)
+        npe = G4Poisson(npe);
+
+        // Gaussian smearing for SiPM excess noise factor
+        // target: sqrt(3.70^2 - 0.45^2) ≈ 3.67 phe (fixed value to match expected resolution at 22 phe)
+        double sigma_sipm = 3.67;
+        npe = G4RandGauss::shoot(npe, sigma_sipm);
+        if (npe < 0) npe = 0;
 
         // ADC: energy from effective LY
         ADC_scint = npe;

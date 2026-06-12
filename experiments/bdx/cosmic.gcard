@@ -3,7 +3,7 @@
 <option name="DATABASE" value="clas12_simulation"/>
 <option name="HIT_PROCESS_LIST" value="BDX"/>
 <detector name="bdx" factory="TEXT" variation="proposal"/>
-<option name="INTEGRATEDRAW" value="cormo flux veto crs"/>
+<option name="INTEGRATEDRAW" value="cormo flux scint crs"/>
 <option name="geometry" value="900x600"/>
 <option name="HALL_MATERIAL"   value="Vacuum" />
 <option name="HALL_DIMENSIONS" value="100.*m,100.*m,100.*m" />
@@ -16,7 +16,7 @@
 
 <!--<option name="INTEGRATEDRAW" value="cormo flux veto crs"/>-->
 	
-<option name="OUTPUT" value="evio, out_cosmic1m.evio"/>
+<option name="OUTPUT" value="evio, out_cosmic1m_6.11.1.evio"/>
 <!--		<option name="PRINT_EVENT"   value="1" />-->
 
 <!--<option name="BEAM_P"   value="mu-,4*GeV, 0*deg, 0*deg"/>-->
@@ -32,9 +32,9 @@
 <option name="RECORD_PASSBY" value="0" />
 
 <option name="COSMICRAYS" value="default, 1.0*GeV, 100.0*GeV, muon"/>
-<option name="COSMICAREA"  value="0.0*cm, 0.0*cm, 0.0*m, 20.0*cm, sph"/>
+<option name="COSMICAREA"  value="0.0*cm, 0.0*cm, 10.0*cm, 20.0*cm, sph"/>
 
-<option name="N" value="1000000000"/>
+<option name="N" value="1000000"/>
 
 <option name="USE_GUI" value="0"/>
 

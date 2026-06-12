@@ -34,16 +34,20 @@
                 veto  |                tdc8  |                                              tdc8  |   20   |                  Di  
                 veto  |                hitn  |                                        hit number  |   99   |                  Di  
                  crs  |              bankid  |                                       crs bank ID  |  300   |                  Di  
-                 crs  |              sector  |                                     sector number  |    1   |                  Di  
-                 crs  |                 xch  |                                        xch number  |    2   |                  Di  
-                 crs  |                 ych  |                                        ych number  |    3   |                  Di  
-                 crs  |                 zch  |                                        zch number  |    4   |                  Di  
-                 crs  |                adcl  |                                              adcl  |    5   |                  Di  
-                 crs  |                adcr  |                                              adcr  |    6   |                  Di  
-                 crs  |                tdcl  |                                              tdcl  |    7   |                  Di  
-                 crs  |                tdcr  |                                              tdcr  |    8   |                  Di  
-                 crs  |                adcb  |                                              adcb  |    9   |                  Di  
-                 crs  |                adcf  |                                              adcf  |   10   |                  Di  
-                 crs  |                tdcb  |                                              tdcb  |   11   |                  Di  
-                 crs  |                tdcf  |                                              tdcf  |   12   |                  Di  
-                 crs  |                hitn  |                                        hit number  |   99   |                  Di  
+                 crs  |                hitn  |                                        hit number  |    1   |                  Di  
+                 crs  |              sector  |                                     module number  |    2   |                  Di  
+                 crs  |               layer  |                                      plane number  |    3   |                  Di  
+                 crs  |           component  |                                         x + 100*y  |    4   |                  Di  
+                 crs  |           ADC_order  |                                         ADC_order  |    5   |                  Di  
+                 crs  |             ADC_ADC  |                             energy measured (keV)  |    6   |                  Di  
+                 crs  |            ADC_time  |                                              time  |    7   |                  Di  
+                 crs  |             ADC_ped  |                                          pedestal  |    8   |                  Di  
+               scint  |              bankid  |                                     scint bank ID  |  400   |                  Di  
+               scint  |                hitn  |                                        hit number  |    1   |                  Di  
+               scint  |              sector  |                                     module number  |    2   |                  Di  
+               scint  |               layer  |                                           channel  |    3   |                  Di  
+               scint  |           component  |                                    in or out veto  |    4   |                  Di  
+               scint  |           ADC_order  |                                         ADC_order  |    5   |                  Di  
+               scint  |             ADC_ADC  |                                     number of phe  |    6   |                  Di  
+               scint  |            ADC_time  |                                              time  |    7   |                  Di  
+               scint  |             ADC_ped  |                                          pedestal  |    8   |                  Di  

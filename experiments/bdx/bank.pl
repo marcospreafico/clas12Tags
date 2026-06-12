@@ -77,10 +77,22 @@ sub define_bdx_bank
     insert_bank_variable(\%configuration, $bankname, "layer",          3, "Di", "plane number");
     insert_bank_variable(\%configuration, $bankname, "component",          4, "Di", "x + 100*y");
     insert_bank_variable(\%configuration, $bankname, "ADC_order",         5, "Di", "ADC_order");
-    insert_bank_variable(\%configuration, $bankname, "ADC_order",         6, "Di", "energy measured (keV)");
+    insert_bank_variable(\%configuration, $bankname, "ADC_ADC",         6, "Di", "energy measured (keV)");
     insert_bank_variable(\%configuration, $bankname, "ADC_time",         7, "Di", "time");
     insert_bank_variable(\%configuration, $bankname, "ADC_ped",         8, "Di", "pedestal");
 
+	$bankId   = 400;
+    $bankname = "scint";
+    
+    insert_bank_variable(\%configuration, $bankname, "bankid", $bankId, "Di", "$bankname bank ID");
+    insert_bank_variable(\%configuration, $bankname, "hitn",       1, "Di", "hit number");
+    insert_bank_variable(\%configuration, $bankname, "sector",          2, "Di", "module number");
+    insert_bank_variable(\%configuration, $bankname, "layer",          3, "Di", "channel");
+    insert_bank_variable(\%configuration, $bankname, "component",          4, "Di", "in or out veto");
+    insert_bank_variable(\%configuration, $bankname, "ADC_order",         5, "Di", "ADC_order");
+    insert_bank_variable(\%configuration, $bankname, "ADC_ADC",         6, "Di", "number of phe");
+    insert_bank_variable(\%configuration, $bankname, "ADC_time",         7, "Di", "time");
+    insert_bank_variable(\%configuration, $bankname, "ADC_ped",         8, "Di", "pedestal");
 
 }
 

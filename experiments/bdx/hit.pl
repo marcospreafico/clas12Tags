@@ -54,6 +54,21 @@ sub define_cormo_hit
     $hit{"pedestal"}        = -20;
     print_hit(\%configuration, \%hit);
 
+	%hit = init_hit();
+	$hit{"name"}            = "scint";
+	$hit{"description"}     = "BDX scintillator";
+	$hit{"identifiers"}     = "sector scintillator channel";
+	$hit{"signalThreshold"} = "200.0*KeV";
+	$hit{"timeWindow"}      = "1000*ns";
+	$hit{"prodThreshold"}   = "100*um";
+	$hit{"maxStep"}         = "500*um";
+	$hit{"delay"}           = "10*ns";
+	$hit{"riseTime"}        = "1*ns";
+	$hit{"fallTime"}        = "1*ns";
+	$hit{"mvToMeV"}         = 100;
+	$hit{"pedestal"}        = -20;
+	print_hit(\%configuration, \%hit);
+
 }
 
 
