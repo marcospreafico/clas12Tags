@@ -26,7 +26,7 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
 
     // Parameters for plastic scintillator
     double light_yield       = 9200;            // photons / MeV
-    double attenuation_length = 100 * cm;       // attenuation length in plastic
+    double attenuation_length = 50 * cm;       // attenuation length in plastic
     double veff              = 13 * cm / ns;    // effective velocity of light
     double sipm_pde          = 0.5;             // SiPM photon detection efficiency
 
@@ -87,9 +87,9 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
 
         // Gaussian smearing for SiPM excess noise factor
         // target: sqrt(3.70^2 - 0.45^2) ≈ 3.67 phe (fixed value to match expected resolution at 22 phe)
-        double sigma_sipm = 3.67;
-        npe = G4RandGauss::shoot(npe, sigma_sipm);
-        if (npe < 0) npe = 0;
+        // double sigma_sipm = 3.67;
+        // npe = G4RandGauss::shoot(npe, sigma_sipm);
+        // if (npe < 0) npe = 0;
 
         // ADC: energy from effective LY
         ADC_scint = npe;
@@ -103,7 +103,7 @@ map<string, double> scint_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     dgtz["component"] = module;
     dgtz["ADC_order"] = 0;
     dgtz["ADC_ADC"]   = 1000 * ADC_scint;     // number of photoelectrons
-    dgtz["ADC_time"]  = 1000 * Etot_B;       
+    dgtz["ADC_time"]  = TDC;           // time at readout in ns
     dgtz["ADC_ped"]   = 0;
 
     return dgtz;

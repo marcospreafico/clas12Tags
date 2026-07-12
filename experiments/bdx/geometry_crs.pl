@@ -157,13 +157,10 @@ sub make_bgo_crs{
     $detector{"type"}        = "Box";
     $detector{"pos"}         = "0*cm 0*cm 0*cm";
     $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    
     $detector{"dimensions"}  = "$alv_in_x*cm $alv_in_y*cm $alv_in_z*cm";
     $detector{"material"}    = "G4_AIR";
     #$detector{"material"}    = "KryptoniteLight";
     print_det(\%configuration, \%detector);
-    
-    
     
     
     my $type = $_[0];
