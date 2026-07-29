@@ -32,3 +32,6 @@ geometry_source/ftof/ftof__parameters_default.txt
 geometry_source/ftof/ftof__parameters_rga_spring2018.txt
 geometry_source/ltcc/ltcc__parameters_original.txt
 geometry_source/rich/cad/
+experiments/bdx/edep.txt
+source/gemc
+source/lib/*.a

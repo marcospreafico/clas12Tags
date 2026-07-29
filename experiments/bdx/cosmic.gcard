@@ -16,7 +16,7 @@
 
 <!--<option name="INTEGRATEDRAW" value="cormo flux veto crs"/>-->
 	
-<option name="OUTPUT" value="evio, out_10.evio"/>
+<option name="OUTPUT" value="evio, out_60crs_7.29.evio"/>
 <!--		<option name="PRINT_EVENT"   value="1" />-->
 
 <!--<option name="BEAM_P"   value="mu-,4*GeV, 0*deg, 0*deg"/>-->
@@ -32,10 +32,10 @@
 <option name="RECORD_PASSBY" value="0" />
 
 <option name="COSMICRAYS" value="default, 1.0*GeV, 100.0*GeV, muon"/>
-<option name="COSMICAREA"  value="0.0*cm, 0.0*cm, 0.0*cm, 40.0*cm, sph"/>
+<option name="COSMICAREA"  value="0.0*cm, 0.0*cm, 0.0*cm, 80.0*cm, sph"/>
 
-<!--<option name="N" value="1000000"/>-->
+<option name="N" value="100000"/>
 
-<!--<option name="USE_GUI" value="0"/>-->
+<option name="USE_GUI" value="0"/>
 
 </gcard>

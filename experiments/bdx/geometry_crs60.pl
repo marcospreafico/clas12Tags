@@ -2,6 +2,10 @@ use strict;
 use warnings;
 
 use Math::Trig;
+# New 60crs geometry using column loops rather than rows.
+# Proper placement using 7x7 and 6x6 masks to get accurate dimensions.
+# No Alveolus volume in this version. Use masks to define the crystal placement.
+
 
 #TO DO: change veto identifiers to use sector to discriminate between IV and OV
 our %configuration;
@@ -9,10 +13,8 @@ our %configuration;
 my $degrad = 0.01745329252;
 my $cic    = 2.54;
 
-#BEGIN general geometry parameters
+my $d = 1./2;  # half-thickness of Al cap
 
-my $d = 1./2; #thickness of aluminum crs cap
-# BEGIN BGO parameters
 my %bgo_types = (
                  "1" => {
                  b => 2.38/2.,
@@ -81,34 +83,40 @@ my %bgo_types = (
 );
 
 
-my $alv_x = 7.4/2;
-my $alv_z = 25./2;
-my $alv_t = 0.2;
+my $layer_gap        = 0.1;    # clearance between adjacent layer faces (cm)
+my $col_gap          = 0.25;   # face-to-face gap between columns — support rods (cm)
+my $Z_shift          = -0.5;   # global Z offset for all crystal volumes (cm)
+my $mask_large_half  = 3.5;    # Y half-size of 7 cm large mask (types 4-8)
+my $mask_small_half  = 5.8/2.; # Y half-size of 5.8 cm small mask (types 1-3)
+my $cap_large_half   = 3.5;    # Y half-height of large plastic mask
+my $cap_large_half_x = 3.4;    # X half-width  of large plastic mask
+my $cap_small_half   = 5.8/2.; # half-dimension of small (6x6 cm) plastic mask
+my $layer_half_y     = $mask_large_half + $layer_gap / 2;  # 3.55 cm
 
-# Alveolus Y sized by the large-crystal mask (7x7 cm cap-end mask → half = 3.5 cm).
-# Small crystals (types 1-3) use a 6x6 cm mask → placed 2.5 cm from alveolus bottom,
-# giving a ~1 cm physical misalignment between large and small crystal rows.
-my $layer_gap       = 0.1;   # small clearance between adjacent layer faces
-my $mask_large_half = 3.5;   # half of 7 cm cap mask — drives layer pitch for types 4-8
-my $mask_small_half = 2.5;   # placement offset from alveolus bottom for types 1-3
-my $alv_in_y  = $mask_large_half + $layer_gap / 2;  # 3.55 cm
-my $alv_y     = $alv_in_y + $alv_t;                 # 3.75 cm  (layer step = 2*alv_y = 7.5 cm)
+# Row centre-to-centre pitch: pitch = mask_half + mask_gap/2
+my $mask_gap          = 2.98;
+my $large_layer_pitch = $mask_large_half  + $mask_gap / 2;  # 5.0 cm
+my $small_layer_pitch = $mask_small_half  + $mask_gap / 2;  # ~4.4 cm
 
-my $alv_in_x = $alv_x - $alv_t;
-my $alv_in_z = $alv_z;
+# Y shift so the bottom edge of small-col row 0 aligns with large-col row 0.
+my $Y_small_shift = 5.5 * ($small_layer_pitch - $large_layer_pitch)
+                  + $layer_half_y - $mask_small_half
+                  - ($cap_large_half - $cap_small_half);
 
-# Centre-to-centre pitch between adjacent alveolus layers.
-# Even rows (iy=0,2,4...) share the same cap orientation — the face-to-face distance
-# in Y between their masks (half-size = mask_large_half) separated by 2 layers is:
-#   mask_gap = 2*layer_pitch - 2*mask_large_half
-# Solving: layer_pitch = mask_large_half + mask_gap/2
-my $mask_gap    = 3.0;   # desired face-to-face gap in Y between same-orientation masks (cm)
-my $layer_pitch = $mask_large_half + $mask_gap / 2;  # = 3.5 + 1.5 = 5.0 cm
+# Fixed column X centres: c-to-c = hw[i] + col_gap + hw[i+1], then centred.
+my @col_mask_hw = ($cap_large_half_x, $cap_large_half_x, $cap_large_half_x,
+                   $cap_small_half,   $cap_small_half);
+my @col_centres = (0);
+for my $i (1..4) {
+    push @col_centres, $col_centres[-1] + $col_mask_hw[$i-1] + $col_gap + $col_mask_hw[$i];
+}
+my $Xcshift = ($col_centres[0] + $col_centres[-1]) / 2;
+@col_centres = map { $_ - $Xcshift } @col_centres;
 
 # Full crystal serial number table: $crs_id{$iy}[$ti], ti=0=leftmost, ti=N=rightmost
 # iy=0 bottom row, iy=10 top row
 my %crs_id = (
-    #  iy  |  ti=0    ti=1    ti=2    ti=3    ti=4   | row type
+    #  iy  |  col=0    col=1    col=2    col=3    col=4   | row type
      0 => [  604,   1116,    407,    311,   1532],  # 65431
      1 => [  627,    507,    418,    307,    124],  # 65431
      2 => [  625,    504,    430,    330,   1513],  # 65431
@@ -122,8 +130,22 @@ my %crs_id = (
     10 => [  812,    924,    926,    217,    212],  # 87722
 );
 
-sub make_main{
-    my %detector = init_det();
+# Per-row crystal type layouts — drives X-position computation
+my @row_layouts = (
+    [6, 5, 4, 3, 1],  # iy=0
+    [6, 5, 4, 3, 1],  # iy=1
+    [6, 5, 4, 3, 1],  # iy=2
+    [6, 5, 4, 3, 1],  # iy=3
+    [6, 5, 4, 3, 1],  # iy=4
+    [6, 5, 4, 3, 1],  # iy=5
+    [6, 5, 4, 3, 1],  # iy=6
+    [6, 5, 4, 2, 1],  # iy=7  (65421)
+    [8, 7, 7, 2, 2],  # iy=8  (87722)
+    [8, 7, 7, 2, 2],  # iy=9
+    [8, 7, 7, 2, 2],  # iy=10
+);
+
+sub make_main{    my %detector = init_det();
     $detector{"name"}        = "main_volume";
     $detector{"mother"}      = "root";
     $detector{"description"} = "World";
@@ -146,119 +168,75 @@ sub make_main{
     print_det(\%configuration, \%detector);
 }
 
+# Per crystal: BGO Trd → Al cap → air hole (child of cap) → plastic cap mask → plastic back mask.
+# Caps and crystals follow $Y_crs; masks follow $Y_layer so row pitch is uniform.
 
-sub make_65431_crs{
-    my %detector = init_det();
+# --- Large crystal columns (types 4-8: 7x7 cm masks) ---
+sub make_large_col_crs {
+    my $ti     = shift;
+    my $mask_t = 0.5;  # half-thickness of plastic masks (full = 1 cm)
 
-    my $ix = $_[1];
-    my $iy = $_[2];   # layer index 0..7
-    my $iz = $_[3];
+    for my $iy (0..10) {
+        my @row = @{ $row_layouts[$iy] };
 
-    # Only crystal types used in this geometry
-    my @types = (6, 5, 4, 3, 1);
-    my @Bv    = map { $bgo_types{$_}{B} } @types;
-
-    my $gap  = 0.05;
-    my @Xpos = (0);
-    for my $i (1..$#types) {
-        push @Xpos, $Xpos[-1] + $Bv[$i-1] + $gap + $Bv[$i];
-    }
-    my $Xshift = ($Xpos[0] + $Xpos[-1]) / 2;
-    @Xpos = map { $_ - $Xshift } @Xpos;
-
-    my $large_alv_x    = $Xpos[-1] + $Bv[-1] + $alv_t;
-    my $large_alv_in_x = $large_alv_x - $alv_t;
-
-    # Y centre of this layer: layers centred around 0
-    my $Y_layer = ($iy - 5.5) * $layer_pitch;
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "detector_volume";
-    $detector{"description"} = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm $Y_layer*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_x*cm $alv_y*cm $alv_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"description"} = "alveolus air";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm 0*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_in_x*cm $alv_in_y*cm $alv_in_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    # Loop over crystal types to create each crystal and its cap
-    for my $ti (0..$#types) {
-        my $type  = $types[$ti];
-        my $Xcrs  = $Xpos[$ti];
+        my $type  = $row[$ti];
+        my $Xcrs  = $col_centres[$ti];
         my $b     = $bgo_types{$type}{b};
         my $B     = $bgo_types{$type}{B};
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
-        my $theta = $bgo_types{$type}{theta};
+
+        my $Y_layer  = ($iy - 5.5) * $large_layer_pitch;
+        my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_large_half);
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
         my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
         my $cap_sign = $is_even ? 1 : -1;
+        my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
+        my $cmaskZ   = $cap_sign * ($L + 2*$d + $mask_t + 0.01) + $cap_sign * $Z_shift;
+        my $backZ    = -$cap_sign * ($L + $mask_t + 0.035)      + $cap_sign * $Z_shift;
 
-        # Large crystals (types 4-8): cap mask 7x7 cm → center 3.5 cm from alveolus bottom
-        # Small crystals (types 1-3): cap mask 6x6 cm → center 2.5 cm from alveolus bottom (~1 cm lower)
-        my $mask_offset = ($type >= 4) ? $mask_large_half : $mask_small_half;
-        my $cY   = -$alv_in_y + $mask_offset;
-        my $cZ   = 0;
-        my $capY = $cY;
-        my $capZ = $cZ + $cap_sign * ($L+$d)*cos($theta * pi /180.0);
+        my $serial = $crs_id{$iy}[$ti] // 0;
 
-        %detector = init_det();
-        $detector{"name"}        = "crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type";
+        # 1. BGO crystal
+        my %detector = init_det();
+        $detector{"name"}        = "crs_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "crs col$ti row$iy type$type";
         $detector{"color"}       = "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Trd";
-        $detector{"pos"}         = "$Xcrs*cm $cY*cm $cZ*cm";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm " . ($cap_sign * $Z_shift) . "*cm";
         $detector{"rotation"}    = $rot;
         $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
-        my $serial   = $crs_id{$iy}[$ti] // 0;
         $detector{"identifiers"} = "sector manual $type xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
         print_det(\%configuration, \%detector);
 
+        # 2. Cap — follows crystal, dimensions B x H
         %detector = init_det();
-        $detector{"name"}        = "cap_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type cap";
+        $detector{"name"}        = "cap_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "Al cap col$ti row$iy";
         $detector{"color"}       = "555555";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Box";
-        $detector{"pos"}         = "$Xcrs*cm $capY*cm $capZ*cm";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm $capZ*cm";
         $detector{"rotation"}    = "0*deg 0*deg 0*deg";
         $detector{"dimensions"}  = "$B*cm $H*cm $d*cm";
         $detector{"material"}    = "G4_Al";
         print_det(\%configuration, \%detector);
 
+        # 3. Hole through cap
         %detector = init_det();
-        $detector{"name"}        = "cap_hole_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "cap_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"description"} = "crs type$type cap hole";
+        $detector{"name"}        = "cap_hole_${ti}_${iy}";
+        $detector{"mother"}      = "cap_${ti}_${iy}";
+        $detector{"description"} = "cap hole col$ti row$iy";
         $detector{"color"}       = "ffffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
@@ -268,121 +246,105 @@ sub make_65431_crs{
         $detector{"dimensions"}  = "0*cm 2*cm $d*cm 0*deg 360*deg";
         $detector{"material"}    = "G4_AIR";
         print_det(\%configuration, \%detector);
+
+        # 4. Plastic cap mask 7x7 cm — centred on ROW ($Y_layer)
+        %detector = init_det();
+        $detector{"name"}        = "cmask_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "plastic cap mask col$ti row$iy";
+        $detector{"color"}       = "fffdd0";
+        $detector{"style"}       = 1;
+        $detector{"visible"}     = 1;
+        $detector{"type"}        = "Box";
+        $detector{"pos"}         = "$Xcrs*cm $Y_layer*cm $cmaskZ*cm";
+        $detector{"rotation"}    = "0*deg 0*deg 0*deg";
+        $detector{"dimensions"}  = "$cap_large_half_x*cm $cap_large_half*cm $mask_t*cm";
+        $detector{"material"}    = "G4_POLYSTYRENE";
+        print_det(\%configuration, \%detector);
+
+        # 5. Plastic back mask 6.8x3 cm — centred on ROW ($Y_layer)
+        %detector = init_det();
+        $detector{"name"}        = "bmask_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "plastic back mask col$ti row$iy";
+        $detector{"color"}       = "f2d5aa";
+        $detector{"style"}       = 1;
+        $detector{"visible"}     = 1;
+        $detector{"type"}        = "Box";
+        $detector{"pos"}         = "$Xcrs*cm $Y_layer*cm $backZ*cm";
+        $detector{"rotation"}    = "0*deg 0*deg 0*deg";
+        $detector{"dimensions"}  = "$cap_large_half_x*cm 1.475*cm $mask_t*cm";
+        $detector{"material"}    = "G4_POLYSTYRENE";
+        print_det(\%configuration, \%detector);
     }
 }
 
-sub make_87722_crs{
-    my %detector = init_det();
+# --- Small crystal columns (types 1-3: 6x6 cm masks) ---
+sub make_small_col_crs {
+    my $ti     = shift;
+    my $mask_t = 0.5;  # half-thickness of plastic masks (full = 1 cm)
 
-    my $ix = $_[1];
-    my $iy = $_[2];   # layer index (8 or 9, placed above the 0..7 stack)
-    my $iz = $_[3];
+    for my $iy (0..10) {
+        my @row = @{ $row_layouts[$iy] };
 
-    # Crystal types for this row — includes duplicates, so $ti is used in names
-    my @types = (8, 7, 7, 2, 2);
-    my @Bv    = map { $bgo_types{$_}{B} } @types;
-
-    my $gap  = 0.01;
-    my @Xpos = (0);
-    for my $i (1..$#types) {
-        push @Xpos, $Xpos[-1] + $Bv[$i-1] + $gap + $Bv[$i];
-    }
-    my $Xshift = ($Xpos[0] + $Xpos[-1]) / 2;
-    @Xpos = map { $_ - $Xshift } @Xpos;
-
-    my $large_alv_x    = $Xpos[-1] + $Bv[-1] + $alv_t;
-    my $large_alv_in_x = $large_alv_x - $alv_t;
-
-    # Same Y_layer formula — iy=8,9,10 extend above the main stack
-    my $Y_layer = ($iy - 5.5) * $layer_pitch;
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "detector_volume";
-    $detector{"description"} = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm $Y_layer*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_x*cm $alv_y*cm $alv_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"description"} = "alveolus air";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm 0*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_in_x*cm $alv_in_y*cm $alv_in_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    for my $ti (0..$#types) {
-        my $type  = $types[$ti];
-        my $Xcrs  = $Xpos[$ti];
+        my $type  = $row[$ti];
+        my $Xcrs  = $col_centres[$ti];
         my $b     = $bgo_types{$type}{b};
         my $B     = $bgo_types{$type}{B};
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
-        my $theta = $bgo_types{$type}{theta};
+
+        my $Y_layer  = ($iy - 5.5) * $small_layer_pitch;
+        my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_small_half) + $Y_small_shift;
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
         my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
         my $cap_sign = $is_even ? 1 : -1;
+        my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
+        my $cmaskZ   = $cap_sign * ($L + 2*$d + $mask_t + 0.01) + $cap_sign * $Z_shift;
+        my $backZ    = -$cap_sign * ($L + $mask_t + 0.035)      + $cap_sign * $Z_shift;
 
-        # Large crystals (types 4-8): cap mask 7x7 cm → center 3.5 cm from alveolus bottom
-        # Small crystals (types 1-3): cap mask 6x6 cm → center 2.5 cm from alveolus bottom (~1 cm lower)
-        my $mask_offset = ($type >= 4) ? $mask_large_half : $mask_small_half;
-        my $cY   = -$alv_in_y + $mask_offset;
-        my $cZ   = 0;
-        my $capY = $cY;
-        my $capZ = $cZ + $cap_sign * ($L+$d)*cos($theta * pi /180.0);
+        my $serial = $crs_id{$iy}[$ti] // 0;
 
-        # Include $ti in name to handle duplicate type numbers within the same row
-        %detector = init_det();
-        $detector{"name"}        = "crs${type}_t${ti}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type pos$ti";
+        # 1. BGO crystal
+        my %detector = init_det();
+        $detector{"name"}        = "crs_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "crs col$ti row$iy type$type";
         $detector{"color"}       = "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Trd";
-        $detector{"pos"}         = "$Xcrs*cm $cY*cm $cZ*cm";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm " . ($cap_sign * $Z_shift) . "*cm";
         $detector{"rotation"}    = $rot;
         $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
-        my $serial   = $crs_id{$iy}[$ti] // 0;
         $detector{"identifiers"} = "sector manual $type xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
         print_det(\%configuration, \%detector);
 
+        # 2. Al cap — follows crystal, dimensions B x H
         %detector = init_det();
-        $detector{"name"}        = "cap_crs${type}_t${ti}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type pos$ti cap";
+        $detector{"name"}        = "cap_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "Al cap col$ti row$iy";
         $detector{"color"}       = "555555";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Box";
-        $detector{"pos"}         = "$Xcrs*cm $capY*cm $capZ*cm";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm $capZ*cm";
         $detector{"rotation"}    = "0*deg 0*deg 0*deg";
         $detector{"dimensions"}  = "$B*cm $H*cm $d*cm";
         $detector{"material"}    = "G4_Al";
         print_det(\%configuration, \%detector);
 
+        # 3. Hole through Al cap
         %detector = init_det();
-        $detector{"name"}        = "cap_hole_crs${type}_t${ti}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "cap_crs${type}_t${ti}_${ix}_${iy}_${iz}";
-        $detector{"description"} = "crs type$type pos$ti cap hole";
+        $detector{"name"}        = "cap_hole_${ti}_${iy}";
+        $detector{"mother"}      = "cap_${ti}_${iy}";
+        $detector{"description"} = "cap hole col$ti row$iy";
         $detector{"color"}       = "ffffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
@@ -392,129 +354,53 @@ sub make_87722_crs{
         $detector{"dimensions"}  = "0*cm 2*cm $d*cm 0*deg 360*deg";
         $detector{"material"}    = "G4_AIR";
         print_det(\%configuration, \%detector);
-    }
-}
 
-sub make_65421_crs{
-    my %detector = init_det();
-
-    my $ix = $_[1];
-    my $iy = $_[2];
-    my $iz = $_[3];
-
-    my @types = (6, 5, 4, 2, 1);
-    my @Bv    = map { $bgo_types{$_}{B} } @types;
-
-    my $gap  = 0.01;
-    my @Xpos = (0);
-    for my $i (1..$#types) {
-        push @Xpos, $Xpos[-1] + $Bv[$i-1] + $gap + $Bv[$i];
-    }
-    my $Xshift = ($Xpos[0] + $Xpos[-1]) / 2;
-    @Xpos = map { $_ - $Xshift } @Xpos;
-
-    my $large_alv_x    = $Xpos[-1] + $Bv[-1] + $alv_t;
-    my $large_alv_in_x = $large_alv_x - $alv_t;
-
-    my $Y_layer = ($iy - 5.5) * $layer_pitch;
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "detector_volume";
-    $detector{"description"} = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm $Y_layer*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_x*cm $alv_y*cm $alv_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    %detector = init_det();
-    $detector{"name"}        = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-    $detector{"mother"}      = "alveolus_$ix"."_"."$iy"."_"."$iz";
-    $detector{"description"} = "alveolus air";
-    $detector{"color"}       = "666666";
-    $detector{"style"}       = 0;
-    $detector{"visible"}     = 1;
-    $detector{"type"}        = "Box";
-    $detector{"pos"}         = "0*cm 0*cm 0*cm";
-    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-    $detector{"dimensions"}  = "$large_alv_in_x*cm $alv_in_y*cm $alv_in_z*cm";
-    $detector{"material"}    = "G4_AIR";
-    print_det(\%configuration, \%detector);
-
-    for my $ti (0..$#types) {
-        my $type  = $types[$ti];
-        my $Xcrs  = $Xpos[$ti];
-        my $b     = $bgo_types{$type}{b};
-        my $B     = $bgo_types{$type}{B};
-        my $h     = $bgo_types{$type}{h};
-        my $H     = $bgo_types{$type}{H};
-        my $L     = $bgo_types{$type}{L};
-        my $theta = $bgo_types{$type}{theta};
-
-        my $is_even  = ($iy % 2 == 0) ? 1 : 0;
-        my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
-        my $cap_sign = $is_even ? 1 : -1;
-
-        # Large crystals (types 4-8): cap mask 7x7 cm → center 3.5 cm from alveolus bottom
-        # Small crystals (types 1-3): cap mask 6x6 cm → center 2.5 cm from alveolus bottom (~1 cm lower)
-        my $mask_offset = ($type >= 4) ? $mask_large_half : $mask_small_half;
-        my $cY   = -$alv_in_y + $mask_offset;
-        my $cZ   = 0;
-        my $capY = $cY;
-        my $capZ = $cZ + $cap_sign * ($L+$d)*cos($theta * pi /180.0);
-
+        # 4. Plastic cap mask 6x6 cm — centred on ROW ($Y_layer)
         %detector = init_det();
-        $detector{"name"}        = "crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type";
-        $detector{"color"}       = "00ffff";
-        $detector{"style"}       = 1;
-        $detector{"visible"}     = 1;
-        $detector{"type"}        = "Trd";
-        $detector{"pos"}         = "$Xcrs*cm $cY*cm $cZ*cm";
-        $detector{"rotation"}    = $rot;
-        $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
-        $detector{"material"}    = "G4_BGO";
-        $detector{"sensitivity"} = "crs";
-        $detector{"hit_type"}    = "crs";
-        my $serial   = $crs_id{$iy}[$ti] // 0;
-        $detector{"identifiers"} = "sector manual $type xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
-        print_det(\%configuration, \%detector);
-
-        %detector = init_det();
-        $detector{"name"}        = "cap_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "alveolus_air_$ix"."_"."$iy"."_"."$iz";
-        $detector{"description"} = "crs type$type cap";
-        $detector{"color"}       = "555555";
+        $detector{"name"}        = "cmask_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "plastic cap mask col$ti row$iy";
+        $detector{"color"}       = "fffdd0";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Box";
-        $detector{"pos"}         = "$Xcrs*cm $capY*cm $capZ*cm";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm $cmaskZ*cm";
         $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-        $detector{"dimensions"}  = "$B*cm $H*cm $d*cm";
-        $detector{"material"}    = "G4_Al";
+        $detector{"dimensions"}  = "$cap_small_half*cm $cap_small_half*cm $mask_t*cm";
+        $detector{"material"}    = "G4_POLYSTYRENE";
         print_det(\%configuration, \%detector);
 
+        # 5. Plastic back mask 6x3 cm — centred on ROW ($Y_layer)
         %detector = init_det();
-        $detector{"name"}        = "cap_hole_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"mother"}      = "cap_crs${type}_${ix}_${iy}_${iz}";
-        $detector{"description"} = "crs type$type cap hole";
-        $detector{"color"}       = "ffffff";
+        $detector{"name"}        = "bmask_${ti}_${iy}";
+        $detector{"mother"}      = "detector_volume";
+        $detector{"description"} = "plastic back mask col$ti row$iy";
+        $detector{"color"}       = "f2d5aa";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
-        $detector{"type"}        = "Tube";
-        $detector{"pos"}         = "0*cm 0*cm 0*cm";
+        $detector{"type"}        = "Box";
+        $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm $backZ*cm";
         $detector{"rotation"}    = "0*deg 0*deg 0*deg";
-        $detector{"dimensions"}  = "0*cm 2*cm $d*cm 0*deg 360*deg";
-        $detector{"material"}    = "G4_AIR";
+        $detector{"dimensions"}  = "$cap_small_half*cm 1.475*cm $mask_t*cm";
+        $detector{"material"}    = "G4_POLYSTYRENE";
         print_det(\%configuration, \%detector);
     }
 }
+
+#Column col=0 (604,627,...). Large crystals, 7x7 cm masks.
+sub make_col0_crs { make_large_col_crs(0);}
+
+#Column col=1 (1116,507,...). Large crystals, 7x7 cm masks.
+sub make_col1_crs { make_large_col_crs(1);}
+
+#Column col=2 (407,418,...). Large crystals, 7x7 cm masks.
+sub make_col2_crs { make_large_col_crs(2);}
+
+#Column col=3 (311,307,...). Small crystals, 6x6 cm masks.
+sub make_col3_crs { make_small_col_crs(3);}
+
+#Column col=4 (1532,124,...). Small crystals, 6x6 cm masks.
+sub make_col4_crs { make_small_col_crs(4);}
 
 sub make_detector{
     my %detector = init_det();
@@ -534,18 +420,15 @@ sub make_detector{
     $detector{"material"}    = "G4_AIR";
     #$detector{"material"}    = "KryptoniteLight";
     print_det(\%configuration, \%detector);
-    
-    # Bottom edge of lowest layer (iy=0): centre = (0-5.5)*layer_pitch, bottom face = centre - alv_y
-    my $crystal_stack_bot = (0 - 5.5) * $layer_pitch - $alv_y;
-    my $scint_ht    = 1.0;                              # half-thickness of scint (2x2 cm)
-    my $scint_bot_Y = $crystal_stack_bot - 0.5 - $scint_ht;   # 0.5cm gap below bottom layer
-    my $scint_top_Y = $scint_bot_Y + 60;                # 1 m above bottom scint
 
-    # 4 top scints equally spaced 3 cm apart in Z, centered on the array
-    # Gaps between scint faces (left→right): 2.5, 3, 3 cm  (each scint is 2 cm wide in Z)
-    # center-to-center: 4.5, 5, 5 cm  →  centered: -7.25, -2.75, +2.25, +7.25
-    my @Ztop = (-7.25, -2.75, 2.25, 7.25);
-    my $top_length = 35./2.;   # length of top scint in cm
+    my $crystal_stack_bot = (0 - 5.5) * $large_layer_pitch - $layer_half_y;
+    my $scint_ht    = 1.0;   # scint half-thickness
+    my $scint_bot_Y = $crystal_stack_bot - 0.5 - $scint_ht;  # 0.5 cm gap below crystal stack
+    my $scint_top_Y = $scint_bot_Y + 60;                      # 60 cm above bottom scint
+
+    # 4 top scints at fixed Z positions matching the 4 bottom scints
+    my @Ztop = (-7.55, -3.05, 2.45, 7.45);
+    my $top_length = 35./2.;
 
     %detector = init_det();
     $detector{"name"}        = "scint_1";
@@ -615,16 +498,15 @@ sub make_detector{
     $detector{"identifiers"} = "sector manual 4 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
-    # iy 0-6:  7 rows of (6,5,4,3,1)
-    for my $layer (0..6)  { make_65431_crs("1", 0, $layer, 0); }
-    # iy 7:    1 row  of (6,5,4,2,1)
-    make_65421_crs("1", 0, 7, 0);
-    # iy 8-10: 3 rows of (8,7,7,2,2)
-    for my $layer (8..10) { make_87722_crs("1", 0, $layer, 0); }
+    make_col0_crs();
+    make_col1_crs();
+    make_col2_crs();
+    make_col3_crs();
+    make_col4_crs();
 
-    # 4 bottom scints — same Z positions as top, at scint_bot_Y
-    my @Zbot = (-7.25, -2.75, 2.25, 7.25);
-    my $bot_length = 45./2.;   # length of bottom scint in cm
+    # 4 bottom scints — same Z positions as top
+    my @Zbot = (-7.55, -3.05, 2.45, 7.45);
+    my $bot_length = 45./2.;
 
     %detector = init_det();
     $detector{"name"}        = "scint_5";

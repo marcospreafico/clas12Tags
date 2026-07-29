@@ -215,12 +215,12 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     
     //WARNING: tdc changed
     dgtz["hitn"]      = hitn;
-    dgtz["sector"]    = sector;
-    dgtz["layer"]     = zch;
-    dgtz["component"] = xch+100*ych;
+    dgtz["sector"]    = sector;    // crystal type (1-8)
+    dgtz["layer"]     = ych;       // row index (0-11)
+    dgtz["component"] = xch;       // 4-digit crystal serial number
     dgtz["ADC_order"] = 0;
     dgtz["ADC_ADC"]   = 1000*ADC_crs; //output = energy in keV
-    dgtz["ADC_time"]  = 1000*Etot_B; //TDC_crs;
+    dgtz["ADC_time"]  = time_crs; // output = time in ps
     dgtz["ADC_ped"]   = 0;
     
 //    	dgtz["adcl"] = ADC_crs;	  //
