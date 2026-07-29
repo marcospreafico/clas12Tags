@@ -5,6 +5,7 @@ use Math::Trig;
 # New 60crs geometry using column loops rather than rows.
 # Proper placement using 7x7 and 6x6 masks to get accurate dimensions.
 # No Alveolus volume in this version. Use masks to define the crystal placement.
+# Frederic Duch, 29-07-2026
 
 
 #TO DO: change veto identifiers to use sector to discriminate between IV and OV
