@@ -83,6 +83,17 @@ my %bgo_types = (
 },
 );
 
+# Color-code crystal by type, so you can visually confirm the construction
+my %type_color = (
+    "1" => "ff8800",  # orange
+    "2" => "ffcc00",  # yellow
+    "3" => "ffff00",  # bright yellow
+    "4" => "00ffff",  # cyan    
+    "5" => "00ff00",  # green
+    "6" => "0088ff",  # blue
+    "7" => "aa00ff",  # purple
+    "8" => "ff00aa",  # pink
+);
 
 my $layer_gap        = 0.1;    # clearance between adjacent layer faces (cm)
 my $col_gap          = 0.25;   # face-to-face gap between columns — support rods (cm)
@@ -118,32 +129,32 @@ my $Xcshift = ($col_centres[0] + $col_centres[-1]) / 2;
 # iy=0 bottom row, iy=10 top row
 my %crs_id = (
     #  iy  |  col=0    col=1    col=2    col=3    col=4   | row type
-     0 => [  604,   1116,    407,    311,   1532],  # 65431
-     1 => [  627,    507,    418,    307,    124],  # 65431
-     2 => [  625,    504,    430,    330,   1513],  # 65431
-     3 => [  607,    503,    419,    305,   1521],  # 65431
-     4 => [ 1002,   1119,    415,   1303,    111],  # 65431
-     5 => [ 1009,    533,   1228,    327,   1524],  # 65431
-     6 => [ 1026,   1102,    433,    322,   1531],  # 65431
-     7 => [ 1001,   1109,   1212,   1421,    132],  # 65421
-     8 => [  825,    916,    911,    220,   1420],  # 87722
-     9 => [  819,    912,    733,   1425,   1414],  # 87722
-    10 => [  812,    924,    926,    217,    212],  # 87722
+     0 => [  701,    702,    703,    000,    000], 
+     1 => [  704,    705,    706,    000,    000], 
+     2 => [  707,    708,    709,    000,    000], 
+     3 => [  710,    711,    712,    000,    000], 
+     4 => [  713,    714,    715,    000,    000],  
+     5 => [  716,    717,    718,    000,    000],  
+     6 => [  719,    720,    721,    000,    000], 
+     7 => [  722,    723,    724,    000,    000],  
+     8 => [  725,    726,    727,    000,    000],  
+     9 => [  728,    729,    730,    000,    000],  
+    10 => [  731,    732,    733,    000,    000],  
 );
 
 # Per-row crystal type layouts — drives X-position computation
 my @row_layouts = (
-    [6, 5, 4, 3, 1],  # iy=0
-    [6, 5, 4, 3, 1],  # iy=1
-    [6, 5, 4, 3, 1],  # iy=2
-    [6, 5, 4, 3, 1],  # iy=3
-    [6, 5, 4, 3, 1],  # iy=4
-    [6, 5, 4, 3, 1],  # iy=5
-    [6, 5, 4, 3, 1],  # iy=6
-    [6, 5, 4, 2, 1],  # iy=7  (65421)
-    [8, 7, 7, 2, 2],  # iy=8  (87722)
-    [8, 7, 7, 2, 2],  # iy=9
-    [8, 7, 7, 2, 2],  # iy=10
+    [7, 7, 7],  # iy=0
+    [7, 7, 7],  # iy=1
+    [7, 7, 7],  # iy=2
+    [7, 7, 7],  # iy=3
+    [7, 7, 7],  # iy=4
+    [7, 7, 7],  # iy=5
+    [7, 7, 7],  # iy=6
+    [7, 7, 7],  # iy=7
+    [7, 7, 7],  # iy=8
+    [7, 7, 7],  # iy=9
+    [7, 7, 7],  # iy=10
 );
 
 sub make_main{    my %detector = init_det();
@@ -187,7 +198,7 @@ sub make_large_col_crs {
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
-
+        my $ch    = $iy * 5 + (4 - $ti) + 1;  # unique channel 1-55: col4=rightmost=1, col0=leftmost=5
         my $Y_layer  = ($iy - 5.5) * $large_layer_pitch;
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_large_half);
 
@@ -205,7 +216,7 @@ sub make_large_col_crs {
         $detector{"name"}        = "crs_${ti}_${iy}";
         $detector{"mother"}      = "detector_volume";
         $detector{"description"} = "crs col$ti row$iy type$type";
-        $detector{"color"}       = "00ffff";
+        $detector{"color"}       = $type_color{$type} // "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Trd";
@@ -215,7 +226,7 @@ sub make_large_col_crs {
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
-        $detector{"identifiers"} = "sector manual $type xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
+        $detector{"identifiers"} = "sector manual $ch xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
         print_det(\%configuration, \%detector);
 
         # 2. Cap — follows crystal, dimensions B x H
@@ -295,6 +306,7 @@ sub make_small_col_crs {
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
+        my $ch    = $iy * 5 + (4 - $ti) + 1;  # unique channel 1-55: col4=rightmost=1, col0=leftmost=5
 
         my $Y_layer  = ($iy - 5.5) * $small_layer_pitch;
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_small_half) + $Y_small_shift;
@@ -313,7 +325,7 @@ sub make_small_col_crs {
         $detector{"name"}        = "crs_${ti}_${iy}";
         $detector{"mother"}      = "detector_volume";
         $detector{"description"} = "crs col$ti row$iy type$type";
-        $detector{"color"}       = "00ffff";
+        $detector{"color"}       = $type_color{$type} // "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
         $detector{"type"}        = "Trd";
@@ -323,7 +335,7 @@ sub make_small_col_crs {
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
-        $detector{"identifiers"} = "sector manual $type xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
+        $detector{"identifiers"} = "sector manual $ch xch manual $serial ych manual $iy zch manual $ti SiPM manual 6025";
         print_det(\%configuration, \%detector);
 
         # 2. Al cap — follows crystal, dimensions B x H
@@ -398,10 +410,10 @@ sub make_col1_crs { make_large_col_crs(1);}
 sub make_col2_crs { make_large_col_crs(2);}
 
 #Column col=3 (311,307,...). Small crystals, 6x6 cm masks.
-sub make_col3_crs { make_small_col_crs(3);}
+# sub make_col3_crs { make_small_col_crs(3);}
 
 #Column col=4 (1532,124,...). Small crystals, 6x6 cm masks.
-sub make_col4_crs { make_small_col_crs(4);}
+# sub make_col4_crs { make_small_col_crs(4);}
 
 sub make_detector{
     my %detector = init_det();
@@ -425,11 +437,11 @@ sub make_detector{
     my $crystal_stack_bot = (0 - 5.5) * $large_layer_pitch - $layer_half_y;
     my $scint_ht    = 1.0;   # scint half-thickness
     my $scint_bot_Y = $crystal_stack_bot - 0.5 - $scint_ht;  # 0.5 cm gap below crystal stack
-    my $scint_top_Y = $scint_bot_Y + 60;                      # 60 cm above bottom scint
+    my $scint_top_Y = $scint_bot_Y + 77;                      # 70 cm above bottom scint
 
     # 4 top scints at fixed Z positions matching the 4 bottom scints
-    my @Ztop = (-7.55, -3.05, 2.45, 7.45);
-    my $top_length = 35./2.;
+    my @Ztop = (-9., -3., 3., 9.);
+    my $top_length = 30./2.;
 
     %detector = init_det();
     $detector{"name"}        = "scint_1";
@@ -445,7 +457,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 1 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 56 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -462,7 +474,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 2 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 57 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -479,7 +491,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 3 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 58 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -496,18 +508,18 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 4 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 59 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     make_col0_crs();
     make_col1_crs();
     make_col2_crs();
-    make_col3_crs();
-    make_col4_crs();
+    # make_col3_crs();
+    # make_col4_crs();
 
     # 4 bottom scints — same Z positions as top
-    my @Zbot = (-7.55, -3.05, 2.45, 7.45);
-    my $bot_length = 45./2.;
+    my @Zbot = (-9., -3., 3., 9.);
+    my $bot_length = 40./2.;
 
     %detector = init_det();
     $detector{"name"}        = "scint_5";
@@ -523,7 +535,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 5 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 60 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -540,7 +552,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 6 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 61 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -557,7 +569,7 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 7 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 62 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
     %detector = init_det();
@@ -574,9 +586,25 @@ sub make_detector{
     $detector{"material"}    = "ScintillatorB";
     $detector{"sensitivity"} = "scint";
     $detector{"hit_type"}    = "scint";
-    $detector{"identifiers"} = "sector manual 8 xch manual 0 ych manual 0 zch manual 0";
+    $detector{"identifiers"} = "sector manual 63 xch manual 0 ych manual 0 zch manual 0";
     print_det(\%configuration, \%detector);
 
+}
+
+sub make_cosmic_sphere {
+    my %detector = init_det();
+    $detector{"name"}        = "cosmic_sphere";
+    $detector{"mother"}      = "main_volume";
+    $detector{"description"} = "80 cm air sphere — visualises cosmic generation area";
+    $detector{"color"}       = "0000ff";
+    $detector{"style"}       = 0;       # wireframe
+    $detector{"visible"}     = 1;
+    $detector{"type"}        = "Sphere";
+    $detector{"pos"}         = "0*cm 0*cm 0*cm";
+    $detector{"rotation"}    = "0*deg 0*deg 0*deg";
+    $detector{"dimensions"}  = "0*cm 50*cm 0*deg 360*deg 0*deg 180*deg";
+    $detector{"material"}    = "G4_AIR";
+    print_det(\%configuration, \%detector);
 }
 
 sub make_all

@@ -389,29 +389,38 @@ void MPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
             double cosmicVY = 100000;
             double cosmicVZ = 100000;
 
-            while ((cosmicVX - cosmicTarget.x()) * (cosmicVX - cosmicTarget.x()) +
-                   (cosmicVY - cosmicTarget.y()) * (cosmicVY - cosmicTarget.y()) +
-                   (cosmicVZ - cosmicTarget.z()) * (cosmicVZ - cosmicTarget.z()) >= cosmicRadius * cosmicRadius) {
-                
-                // point generated inside spherical or cylindrical volume
-                if (cosmicGeo == "sph" || cosmicGeo == "sphere") {
-                    // point inside spherical volume
-                    cosmicVX = cosmicTarget.x() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
-                    cosmicVY = cosmicTarget.y() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
-                    cosmicVZ = cosmicTarget.z() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
-                } else if(cosmicGeo == "rec"){ //M.S.
-                    // Uniform over a rectangular surface Z = 6*Radius, X = 2*Radius, Y = 2*Radius
-                    cosmicVX = (-cosmicRadius + 2 * cosmicRadius * G4UniformRand());
-                    cosmicVZ = 3 * (-cosmicRadius + 2 * cosmicRadius * G4UniformRand());
-                    cosmicVY = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
-                } else {
-                    // point inside a cylinder, height of the cylinder = cosmicRadius/2.
-                    double h = cosmicRadius / 2.;
-                    cosmicVX = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
-                    double sig = 1.;
-                    if ((2. * G4UniformRand() - 1) < 0) sig = -1.;
-                    cosmicVY = h * (2. * G4UniformRand() - 1) * sig;
-                    cosmicVZ = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+            if (cosmicGeo == "plane") {
+                // 2D source plane above the setup: muons start uniformly distributed
+                // over a rectangular plane (full width 2*cosmicRadius in X and Z,
+                // fixed height cosmicTarget.y()). 
+                cosmicVX = cosmicTarget.x() + (2. * G4UniformRand() - 1.) * cosmicRadius;
+                cosmicVY = cosmicTarget.y();
+                cosmicVZ = cosmicTarget.z() + (2. * G4UniformRand() - 1.) * cosmicRadius;
+            } else {
+                while ((cosmicVX - cosmicTarget.x()) * (cosmicVX - cosmicTarget.x()) +
+                       (cosmicVY - cosmicTarget.y()) * (cosmicVY - cosmicTarget.y()) +
+                       (cosmicVZ - cosmicTarget.z()) * (cosmicVZ - cosmicTarget.z()) >= cosmicRadius * cosmicRadius) {
+
+                    // point generated inside spherical or cylindrical volume
+                    if (cosmicGeo == "sph" || cosmicGeo == "sphere") {
+                        // point inside spherical volume
+                        cosmicVX = cosmicTarget.x() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                        cosmicVY = cosmicTarget.y() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                        cosmicVZ = cosmicTarget.z() - cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                    } else if(cosmicGeo == "rec"){ //M.S.
+                        // Uniform over a rectangular surface Z = 6*Radius, X = 2*Radius, Y = 2*Radius
+                        cosmicVX = (-cosmicRadius + 2 * cosmicRadius * G4UniformRand());
+                        cosmicVZ = 3 * (-cosmicRadius + 2 * cosmicRadius * G4UniformRand());
+                        cosmicVY = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                    } else {
+                        // point inside a cylinder, height of the cylinder = cosmicRadius/2.
+                        double h = cosmicRadius / 2.;
+                        cosmicVX = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                        double sig = 1.;
+                        if ((2. * G4UniformRand() - 1) < 0) sig = -1.;
+                        cosmicVY = h * (2. * G4UniformRand() - 1) * sig;
+                        cosmicVZ = -cosmicRadius + 2 * cosmicRadius * G4UniformRand();
+                    }
                 }
             }
 
@@ -442,8 +451,14 @@ void MPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
                 double cosmicProb = G4UniformRand() * (cosmicProbMax - cosmicProbMin) + cosmicProbMin;
 
                 double thiscthe;
-                
-                thiscthe = G4UniformRand();              //ctheta uniform between 0 and 1
+
+                // For the "plane" source, force straight-down incidence (theta = 0,
+                // i.e. ctheta = 1) instead of sampling a wide [0,45]deg cone.
+                if (cosmicGeo == "plane") {
+                    thiscthe = 1.0;
+                } else {
+                    thiscthe = 0.70711 + (1.0 - 0.70711) * G4UniformRand();  // ctheta between cos(45deg) and 1 → theta in [0°, 45°]
+                }
                 thisthe = acos(thiscthe);
 
                 thisKinE = (KinEmax - KinEmin) * G4UniformRand() + KinEmin;
@@ -459,16 +474,23 @@ void MPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
                     thisKinE = (KinEmax - KinEmin) * G4UniformRand() + KinEmin;
                     thisMom = sqrt((thisKinE + 0.104) * (thisKinE + 0.104) - 0.104 * 0.104);
 
-                    thiscthe = G4UniformRand();
+                    if (cosmicGeo == "plane") {
+                        thiscthe = 1.0;
+                    } else {
+                        thiscthe = 0.70711 + (1.0 - 0.70711) * G4UniformRand();
+                    }
                     thisthe = acos(thiscthe);
 
                     cosmic = cosmicMuBeam(thiscthe, thisKinE);
                     cosmicProb = G4UniformRand() * (cosmicProbMax - cosmicProbMin) + cosmicProbMin;
                 }
-                if (Nextr > 999999) cout << " !!! LOOPING IN MU EXTRACTION !!! exceeded " << Nextr << " extractions !!!" << Nextr << endl;
-                
-                thisMom = thisMom * GeV;
+                if (Nextr > 999999) cout << " !!! LOOPING IN MU EXTRACTION !!! exceeded " << Nextr << " extractions !!!" << Nextr << endl;                
+
             }
+
+    
+
+
 
             // isotropic in phi
             thisPhi = -pi + 2 * pi * G4UniformRand();
@@ -477,9 +499,21 @@ void MPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
             // attention:
             // axis transformation, z <> y,  x <> -x
             // cause the cosmics come from the sky
-            double pvx = cosmicVX - 2 * cosmicRadius * sin(thisthe) * cos(thisPhi);
-            double pvy = cosmicVY + 2 * cosmicRadius * cos(thisthe);
-            double pvz = cosmicVZ + 2 * cosmicRadius * sin(thisthe) * sin(thisPhi);
+            //
+            // for the "plane" source, cosmicVX/VY/VZ already ARE the start vertex
+            // (muons start on a flat plane above the setup), theta/phi are still
+            // sampled from the normal angular distribution, so no projection
+            // offset is needed - the plane itself is the starting surface.
+            double pvx, pvy, pvz;
+            if (cosmicGeo == "plane") {
+                pvx = cosmicVX;
+                pvy = cosmicVY;
+                pvz = cosmicVZ;
+            } else {
+                pvx = cosmicVX - 2 * cosmicRadius * sin(thisthe) * cos(thisPhi);
+                pvy = cosmicVY + 2 * cosmicRadius * cos(thisthe);
+                pvz = cosmicVZ + 2 * cosmicRadius * sin(thisthe) * sin(thisPhi);
+            }
             particleGun->SetParticlePosition(G4ThreeVector(pvx, pvy, pvz));
 
             if (cosmicNeutrons) {

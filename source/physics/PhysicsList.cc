@@ -421,14 +421,14 @@ void PhysicsList::ConstructParticle()
 
 	g4DecayPhys->ConstructParticle();
 
-	if(muonRadDecay){
-		G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
-		G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
-		MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu+",1.00));
-		MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu-",1.00));
-		G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
-		G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
-	}
+	// if(muonRadDecay){
+	// 	G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
+	// 	G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
+	// 	MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu+",1.00));
+	// 	MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu-",1.00));
+	// 	G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
+	// 	G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
+	// }
 
     /*  Vanilla Dark Photon model parameters */
     // TO DO: generalize to other models of DM
@@ -572,16 +572,16 @@ void PhysicsList::ConstructProcess()
 				}
 			}
 
-			if(muonRadDecay){
-				G4DecayWithSpin* theDecayProcess = new G4DecayWithSpin();
-				decay = processTable->FindProcess("Decay",particle);
-				if (theDecayProcess->IsApplicable(*particle)) {
-					if(decay) pmanager->RemoveProcess(decay);
-					pmanager->AddProcess(theDecayProcess);
-					pmanager->SetProcessOrdering(theDecayProcess, idxPostStep);
-					pmanager->SetProcessOrderingToLast(theDecayProcess, idxAtRest);
-				}
-			}
+			// if(muonRadDecay){
+			// 	G4DecayWithSpin* theDecayProcess = new G4DecayWithSpin();
+			// 	decay = processTable->FindProcess("Decay",particle);
+			// 	if (theDecayProcess->IsApplicable(*particle)) {
+			// 		if(decay) pmanager->RemoveProcess(decay);
+			// 		pmanager->AddProcess(theDecayProcess);
+			// 		pmanager->SetProcessOrdering(theDecayProcess, idxPostStep);
+			// 		pmanager->SetProcessOrderingToLast(theDecayProcess, idxAtRest);
+			// 	}
+			// }
             
             /* Vanilla Dark Photon Model */
             if (gemcOpt.optMap["DARK_PHOTON"].args == "no" || gemcOpt.optMap["DARK_MATTER"].args == "no" || gemcOpt.optMap["DARK_COUPLINGS"].args == "no") {
@@ -610,7 +610,7 @@ void PhysicsList::ConstructProcess()
             }
             /* end of Dark Photon model */
             
-            /* Dark Scalar model */
+            /* Dark Scalar model 
             if (gemcOpt.optMap["DARK_SCALAR"].args == "no") {
                 return;
             } else {

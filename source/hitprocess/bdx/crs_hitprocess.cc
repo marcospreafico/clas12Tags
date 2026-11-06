@@ -215,7 +215,7 @@ map<string, double> crs_HitProcess::integrateDgt(MHit* aHit, int hitn) {
     
     //WARNING: tdc changed
     dgtz["hitn"]      = hitn;
-    dgtz["sector"]    = sector;    // crystal type (1-8)
+    dgtz["sector"]    = sector;    // channel number
     dgtz["layer"]     = ych;       // row index (0-11)
     dgtz["component"] = xch;       // 4-digit crystal serial number
     dgtz["ADC_order"] = 0;
