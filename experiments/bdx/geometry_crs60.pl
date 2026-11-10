@@ -128,34 +128,36 @@ my $Xcshift = ($col_centres[0] + $col_centres[-1]) / 2;
 # Full crystal serial number table: $crs_id{$iy}[$ti], ti=0=leftmost, ti=N=rightmost
 # iy=0 bottom row, iy=10 top row
 my %crs_id = (
-    #  iy  |  col=0    col=1    col=2    col=3    col=4   | row type
-     0 => [  701,    702,    703,    000,    000], 
-     1 => [  704,    705,    706,    000,    000], 
-     2 => [  707,    708,    709,    000,    000], 
-     3 => [  710,    711,    712,    000,    000], 
-     4 => [  713,    714,    715,    000,    000],  
-     5 => [  716,    717,    718,    000,    000],  
-     6 => [  719,    720,    721,    000,    000], 
-     7 => [  722,    723,    724,    000,    000],  
-     8 => [  725,    726,    727,    000,    000],  
-     9 => [  728,    729,    730,    000,    000],  
-    10 => [  731,    732,    733,    000,    000],  
+    #  iy  |  ti=0    ti=1    ti=2    ti=3    ti=4   | row type
+     0 => [  5,    4,    3,    2,    1], 
+     1 => [  10,    9,    8,    7,    6], 
+     2 => [  15,    14,    13,    12,    11], 
+     3 => [  20,    19,    18,    17,    16], 
+     4 => [  25,    24,    23,    22,    21],  
+     5 => [  30,    29,    28,    27,    26],  
+     6 => [  35,    34,    33,    32,    31], 
+     7 => [  40,    39,    38,    37,    36],  
+     8 => [  45,    44,    43,    42,    41],  
+     9 => [  50,    49,    48,    47,    46],  
+    10 => [  55,    54,    53,    52,    51],  
 );
 
 # Per-row crystal type layouts — drives X-position computation
+# iy = 0
 my @row_layouts = (
-    [7, 7, 7],  # iy=0
-    [7, 7, 7],  # iy=1
-    [7, 7, 7],  # iy=2
-    [7, 7, 7],  # iy=3
-    [7, 7, 7],  # iy=4
-    [7, 7, 7],  # iy=5
-    [7, 7, 7],  # iy=6
-    [7, 7, 7],  # iy=7
-    [7, 7, 7],  # iy=8
-    [7, 7, 7],  # iy=9
-    [7, 7, 7],  # iy=10
+    [4, 4, 4, 2, 2],
+    [4, 4, 4, 2, 2], 
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],  
+    [4, 4, 4, 2, 2],
 );
+# iy =10
 
 sub make_main{    my %detector = init_det();
     $detector{"name"}        = "main_volume";
@@ -313,6 +315,10 @@ sub make_small_col_crs {
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
         my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
+
+        # rotate this one crystal 90° about Z
+        $rot = "0*deg 0*deg 90*deg" if ($ti == 4 && $iy == 10);  
+
         my $cap_sign = $is_even ? 1 : -1;
         my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
         my $cmaskZ   = $cap_sign * ($L + 2*$d + $mask_t + 0.01) + $cap_sign * $Z_shift;
@@ -410,10 +416,10 @@ sub make_col1_crs { make_large_col_crs(1);}
 sub make_col2_crs { make_large_col_crs(2);}
 
 #Column col=3 (311,307,...). Small crystals, 6x6 cm masks.
-# sub make_col3_crs { make_small_col_crs(3);}
+sub make_col3_crs { make_small_col_crs(3);}
 
 #Column col=4 (1532,124,...). Small crystals, 6x6 cm masks.
-# sub make_col4_crs { make_small_col_crs(4);}
+sub make_col4_crs { make_small_col_crs(4);}
 
 sub make_detector{
     my %detector = init_det();
@@ -514,8 +520,8 @@ sub make_detector{
     make_col0_crs();
     make_col1_crs();
     make_col2_crs();
-    # make_col3_crs();
-    # make_col4_crs();
+    make_col3_crs();
+    make_col4_crs();
 
     # 4 bottom scints — same Z positions as top
     my @Zbot = (-9., -3., 3., 9.);

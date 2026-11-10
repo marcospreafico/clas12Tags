@@ -1,6 +1,9 @@
 .DS_Store
 *.hipo
 
+*.evio
+*.root 
+
 geometry_source/**/*__geometry_*.txt
 geometry_source/**/*__bank.txt
 geometry_source/**/*__materials_*.txt
