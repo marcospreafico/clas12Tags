@@ -36,25 +36,27 @@ my %bgo_types = (
     L => 24./2.,
     theta => 6./2,
 },
+
+# "2" => {
+#     b => 2.34/2.,
+#     h => 2.38/2.,
+#     B => 5.26/2.,
+#     H => 5.31/2.,
+#     L => 24./2.,
+#     theta => 7./2,
+# },
+
 "2" => {
-    b => 2.34/2.,
-    h => 2.38/2.,
-    B => 5.26/2.,
+    Bg => 5.26/2.,
+    Bm => 4.39/2.,
     H => 5.31/2.,
+    bg => 2.34/2.,
+    bm => 1.96/2.,
+    h => 2.38/2.,
     L => 24./2.,
     theta => 7./2,
 },
 
-# "2" => {
-#     Bg => 5.26/2.,
-#     Bm => 4.39/2.,
-#     H => 5.31/2.,
-#     bg => 2.34/2.,
-#     bm => 1.96/2.,
-#     h => 2.38/2.,
-#     L => 24./2.,
-#     theta => 7./2,
-# },
 # "3" => {
 #     b => 2.27/2.,
 #     h => 2.13/2.,
@@ -427,10 +429,10 @@ sub make_small_col_crs {
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_small_half) + $Y_small_shift;
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
-        my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
+        my $rot      = $is_even ? "0*deg 0*deg 90*deg" : "0*deg 180*deg 90*deg";
 
         # rotate this one crystal 90° about Z
-        $rot = "0*deg 0*deg 180*deg" if ($ti == 4 && $iy == 10);  
+        # $rot = "0*deg 0*deg 180*deg" if ($ti == 4 && $iy == 10);  
 
         my $cap_sign = $is_even ? 1 : -1;
         my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
