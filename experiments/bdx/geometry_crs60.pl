@@ -8,7 +8,6 @@ use Math::Trig;
 # Frederic Duch, 29-07-2026
 
 
-#TO DO: change veto identifiers to use sector to discriminate between IV and OV
 our %configuration;
 
 my $degrad = 0.01745329252;
@@ -17,15 +16,16 @@ my $cic    = 2.54;
 my $d = 1./2;  # half-thickness of Al cap
 
 my %bgo_types = (
-                 # Old Trd-style definition for type "1", kept for reference.
-                 # "1" => {
-                 # b => 2.38/2.,
-                 # h => 2.44/2.,
-                 # B => 4.82/2.,
-                 # H => 4.96/2.,
-                 # L => 24./2.,
-                 # theta => 6./2,
-                 # },
+                 # Old Trd-style definition 
+                #  "1" => {
+                #  b => 2.38/2.,
+                #  h => 2.44/2.,
+                #  B => 4.82/2.,
+                #  H => 4.96/2.,
+                #  L => 24./2.,
+                #  theta => 6./2,
+                #  },
+
                  "1" => {
     Bg => 4.82/2.,
     Bm => 3.95/2.,
@@ -36,25 +36,25 @@ my %bgo_types = (
     L => 24./2.,
     theta => 6./2,
 },
-# "2" => {
-#     b => 2.34/2.,
-#     h => 2.38/2.,
-#     B => 5.26/2.,
-#     H => 5.31/2.,
-#     L => 24./2.,
-#     theta => 7./2,
-# },
-
 "2" => {
-    Bg => 5.26/2.,
-    Bm => 4.39/2.,
-    H => 5.31/2.,
-    bg => 2.34/2.,
-    bm => 1.96/2.,
+    b => 2.34/2.,
     h => 2.38/2.,
+    B => 5.26/2.,
+    H => 5.31/2.,
     L => 24./2.,
     theta => 7./2,
 },
+
+# "2" => {
+#     Bg => 5.26/2.,
+#     Bm => 4.39/2.,
+#     H => 5.31/2.,
+#     bg => 2.34/2.,
+#     bm => 1.96/2.,
+#     h => 2.38/2.,
+#     L => 24./2.,
+#     theta => 7./2,
+# },
 # "3" => {
 #     b => 2.27/2.,
 #     h => 2.13/2.,
@@ -95,7 +95,7 @@ my %bgo_types = (
     h => 2.45/2.,
     L => 24./2.,
     theta => 10./2.,
-}
+},
 
 # "5" => {
 #     b => 2.16/2.,
