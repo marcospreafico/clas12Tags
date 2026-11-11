@@ -17,67 +17,163 @@ my $cic    = 2.54;
 my $d = 1./2;  # half-thickness of Al cap
 
 my %bgo_types = (
+                 # Old Trd-style definition for type "1", kept for reference.
+                 # "1" => {
+                 # b => 2.38/2.,
+                 # h => 2.44/2.,
+                 # B => 4.82/2.,
+                 # H => 4.96/2.,
+                 # L => 24./2.,
+                 # theta => 6./2,
+                 # },
                  "1" => {
-                 b => 2.38/2.,
-                 B => 4.82/2.,
-                 h => 2.44/2.,
-                 H => 4.96/2.,
-                 L => 24./2.,
-                 theta => 6./2,
+    Bg => 4.82/2.,
+    Bm => 3.95/2.,
+    H => 4.96/2.,
+    bg => 2.38/2.,
+    bm => 1.96/2.,
+    h => 2.44/2.,
+    L => 24./2.,
+    theta => 6./2,
 },
+# "2" => {
+#     b => 2.34/2.,
+#     h => 2.38/2.,
+#     B => 5.26/2.,
+#     H => 5.31/2.,
+#     L => 24./2.,
+#     theta => 7./2,
+# },
+
 "2" => {
-    b => 2.34/2.,
-    B => 5.26/2.,
-    h => 2.38/2.,
+    Bg => 5.26/2.,
+    Bm => 4.39/2.,
     H => 5.31/2.,
+    bg => 2.34/2.,
+    bm => 1.96/2.,
+    h => 2.38/2.,
     L => 24./2.,
     theta => 7./2,
 },
+# "3" => {
+#     b => 2.27/2.,
+#     h => 2.13/2.,
+#     b => 5.64/2.,
+#     B => 5.64/2.,
+#     h => 5.27/2.,
+#     H => 5.27/2.,
+#     L => 24./2.,
+#     theta => 7.5/2,
+# },
+
 "3" => {
-    b => 2.27/2.,
-    B => 5.64/2.,
-    h => 2.13/2.,
+    Bg => 5.64/2.,
+    Bm => 4.87/2.,
     H => 5.27/2.,
+    bg => 2.27/2.,
+    bm => 1.96/2.,
+    h => 2.13/2.,
     L => 24./2.,
     theta => 7.5/2,
 },
+
+# "4" => {
+#     b => 2.23/2.,
+#     B => 6.17/2.,
+#     h => 2.45/2.,
+#     H => 6.65/2.,
+#     L => 24./2.,
+#     theta => 10./2,
+# },
+
 "4" => {
-    b => 2.23/2.,
-    B => 6.17/2.,
-    h => 2.45/2.,
+    Bg => 6.17/2.,
+    Bm => 5.34/2.,
     H => 6.65/2.,
+    bg => 2.23/2.,
+    bm => 1.96/2.,
+    h => 2.45/2.,
     L => 24./2.,
-    theta => 10./2,
-},
+    theta => 10./2.,
+}
+
+# "5" => {
+#     b => 2.16/2.,
+#     B => 6.47/2.,
+#     h => 2.08/2.,
+#     H => 6.28/2.,
+#     L => 24./2.,
+#     theta => 10./2,
+# },
+
 "5" => {
-    b => 2.16/2.,
-    B => 6.47/2.,
-    h => 2.08/2.,
+    Bg => 6.47/2.,
+    Bm => 5.86/2.,
     H => 6.28/2.,
+    bg => 2.16/2.,
+    bm => 1.96/2.,
+    h => 2.08/2.,
     L => 24./2.,
     theta => 10./2,
 },
+
+# "6" => {
+#     b => 2.08/2.,
+#     B => 6.67/2.,
+#     h => 1.88/2.,
+#     H => 6.08/2.,
+#     L => 24./2.,
+#     theta => 10./2,
+# },
+
 "6" => {
-    b => 2.08/2.,
-    B => 6.67/2.,
-    h => 1.88/2.,
+    Bg => 6.67/2.,
+    Bm => 6.27/2.,
     H => 6.08/2.,
+    bg => 2.08/2.,
+    bm => 1.96/2.,
+    h => 1.88/2.,
     L => 24./2.,
     theta => 10./2,
 },
+
+# "7" => {
+#     b => 2.01/2.,
+#     B => 6.74/2.,
+#     h => 1.74/2.,
+#     H => 5.80/2.,
+#     L => 24./2.,
+#     theta => 9.667/2,
+# },
+
 "7" => {
-    b => 2.01/2.,
-    B => 6.74/2.,
-    h => 1.74/2.,
+    Bg => 6.74/2.,
+    Bm => 6.55/2.,
     H => 5.80/2.,
+    bg => 2.01/2.,
+    bm => 1.96/2.,
+    h => 1.74/2.,
     L => 24./2.,
     theta => 9.667/2,
 },
+
+# "8" => {
+#     b => 1.96/2.,
+#     B => 6.68/2.,
+#     h => 1.69/2.,
+#     H => 5.75/2.,
+#     L => 24./2.,
+#     theta => 9.667/2,
+# },
+# );
+
 "8" => {
-    b => 1.96/2.,
-    B => 6.68/2.,
-    h => 1.69/2.,
+    Bg => 6.68/2.,
+    Bm => 6.68/2.,
     H => 5.75/2.,
+    bg => 1.96/2.,
+    bm => 1.96/2.,
+    h => 1.69/2.,
     L => 24./2.,
     theta => 9.667/2,
 },
@@ -129,8 +225,8 @@ my $Xcshift = ($col_centres[0] + $col_centres[-1]) / 2;
 # iy=0 bottom row, iy=10 top row
 my %crs_id = (
     #  iy  |  ti=0    ti=1    ti=2    ti=3    ti=4   | row type
-     0 => [  5,    4,    3,    2,    1], 
-     1 => [  10,    9,    8,    7,    6], 
+     0 => [   5,     4,     3,     2,     1], 
+     1 => [  10,     9,     8,     7,     6], 
      2 => [  15,    14,    13,    12,    11], 
      3 => [  20,    19,    18,    17,    16], 
      4 => [  25,    24,    23,    22,    21],  
@@ -143,20 +239,16 @@ my %crs_id = (
 );
 
 # Per-row crystal type layouts — drives X-position computation
+# Large-crystal type (columns 0-2) and small-crystal type (columns 3-4) are
+# read from config.dat ("large_crs" / "small_crs") so you can change them
+my $large_crs = $configuration{"large_crs"} // 6;
+my $small_crs = $configuration{"small_crs"} // 1;
+
 # iy = 0
-my @row_layouts = (
-    [4, 4, 4, 2, 2],
-    [4, 4, 4, 2, 2], 
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],  
-    [4, 4, 4, 2, 2],
-);
+my @row_layouts;
+for my $iy (0..10) {
+    push @row_layouts, [$large_crs, $large_crs, $large_crs, $small_crs, $small_crs];
+}
 # iy =10
 
 sub make_main{    my %detector = init_det();
@@ -195,8 +287,9 @@ sub make_large_col_crs {
 
         my $type  = $row[$ti];
         my $Xcrs  = $col_centres[$ti];
+        my $is_g4trap = exists $bgo_types{$type}{Bg};  # trapezoidal-prism shape (G4Trap) vs Trd
         my $b     = $bgo_types{$type}{b};
-        my $B     = $bgo_types{$type}{B};
+        my $B     = $is_g4trap ? $bgo_types{$type}{Bg} : $bgo_types{$type}{B};
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
@@ -221,10 +314,29 @@ sub make_large_col_crs {
         $detector{"color"}       = $type_color{$type} // "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
-        $detector{"type"}        = "Trd";
+        if ($is_g4trap) {
+            # Face at -L (small end): bm/bg at y=-h/2 / y=+h/2.
+            # Face at +L (large end): Bm/Bg at y=-H/2 / y=+H/2.
+            my $Bg = $bgo_types{$type}{Bg};
+            my $Bm = $bgo_types{$type}{Bm};
+            my $bg = $bgo_types{$type}{bg};
+            my $bm = $bgo_types{$type}{bm};
+            $detector{"type"}       = "G4GenericTrap";
+            $detector{"dimensions"} = "$L*cm "
+                . (-$bm) . "*cm " . (-$h) . "*cm "
+                . "$bm*cm " . (-$h) . "*cm "
+                . "$bg*cm $h*cm "
+                . (-$bg) . "*cm $h*cm "
+                . (-$Bm) . "*cm " . (-$H) . "*cm "
+                . "$Bm*cm " . (-$H) . "*cm "
+                . "$Bg*cm $H*cm "
+                . (-$Bg) . "*cm $H*cm";
+        } else {
+            $detector{"type"}       = "Trd";
+            $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
+        }
         $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm " . ($cap_sign * $Z_shift) . "*cm";
         $detector{"rotation"}    = $rot;
-        $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
@@ -303,8 +415,9 @@ sub make_small_col_crs {
 
         my $type  = $row[$ti];
         my $Xcrs  = $col_centres[$ti];
+        my $is_g4trap = exists $bgo_types{$type}{Bg};  # trapezoidal-prism shape (G4Trap) vs Trd
         my $b     = $bgo_types{$type}{b};
-        my $B     = $bgo_types{$type}{B};
+        my $B     = $is_g4trap ? $bgo_types{$type}{Bg} : $bgo_types{$type}{B};
         my $h     = $bgo_types{$type}{h};
         my $H     = $bgo_types{$type}{H};
         my $L     = $bgo_types{$type}{L};
@@ -317,7 +430,7 @@ sub make_small_col_crs {
         my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
 
         # rotate this one crystal 90° about Z
-        $rot = "0*deg 0*deg 90*deg" if ($ti == 4 && $iy == 10);  
+        $rot = "0*deg 0*deg 180*deg" if ($ti == 4 && $iy == 10);  
 
         my $cap_sign = $is_even ? 1 : -1;
         my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
@@ -334,10 +447,29 @@ sub make_small_col_crs {
         $detector{"color"}       = $type_color{$type} // "00ffff";
         $detector{"style"}       = 1;
         $detector{"visible"}     = 1;
-        $detector{"type"}        = "Trd";
+        if ($is_g4trap) {
+            # Face at -L (small end): bm/bg at y=-h/2 / y=+h/2.
+            # Face at +L (large end): Bm/Bg at y=-H/2 / y=+H/2.
+            my $Bg = $bgo_types{$type}{Bg};
+            my $Bm = $bgo_types{$type}{Bm};
+            my $bg = $bgo_types{$type}{bg};
+            my $bm = $bgo_types{$type}{bm};
+            $detector{"type"}       = "G4GenericTrap";
+            $detector{"dimensions"} = "$L*cm "
+                . (-$bm) . "*cm " . (-$h) . "*cm "
+                . "$bm*cm " . (-$h) . "*cm "
+                . "$bg*cm $h*cm "
+                . (-$bg) . "*cm $h*cm "
+                . (-$Bm) . "*cm " . (-$H) . "*cm "
+                . "$Bm*cm " . (-$H) . "*cm "
+                . "$Bg*cm $H*cm "
+                . (-$Bg) . "*cm $H*cm";
+        } else {
+            $detector{"type"}       = "Trd";
+            $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
+        }
         $detector{"pos"}         = "$Xcrs*cm $Y_crs*cm " . ($cap_sign * $Z_shift) . "*cm";
         $detector{"rotation"}    = $rot;
-        $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
         $detector{"material"}    = "G4_BGO";
         $detector{"sensitivity"} = "crs";
         $detector{"hit_type"}    = "crs";
