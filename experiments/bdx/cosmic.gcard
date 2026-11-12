@@ -16,7 +16,7 @@
 
 <!--<option name="INTEGRATEDRAW" value="cormo flux veto crs"/>-->
 	
-<option name="OUTPUT" value="evio, test.evio"/>
+<option name="OUTPUT" value="evio, out1.evio"/>
 <!--		<option name="PRINT_EVENT"   value="1" />-->
 
 <option name="BEAM_P"   value="mu-,4*GeV, 0*deg, 0*deg"/>

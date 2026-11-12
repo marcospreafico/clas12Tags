@@ -429,7 +429,7 @@ sub make_small_col_crs {
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_small_half) + $Y_small_shift;
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
-        my $rot      = $is_even ? "0*deg 0*deg 90*deg" : "0*deg 180*deg 90*deg";
+        my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
 
         # rotate this one crystal 90° about Z
         # $rot = "0*deg 0*deg 180*deg" if ($ti == 4 && $iy == 10);  
