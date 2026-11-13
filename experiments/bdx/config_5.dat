@@ -2,7 +2,7 @@
 
 # Detector name and variation
 detector_name: bdx
-variation:     proposal
+variation:     standard
 
 # available variations:
 # proposal = 4 modules with crystals along the beam direction 

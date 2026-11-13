@@ -246,6 +246,9 @@ my %crs_id = (
 my $large_crs = $configuration{"large_crs"} // 6;
 my $small_crs = $configuration{"small_crs"} // 1;
 
+# Extra Z-axis rotation (deg) applied to small-column crystals, controllable from config.dat
+my $crs_zrot = $configuration{"crs_zrot"} // 0;
+
 # iy = 0
 my @row_layouts;
 for my $iy (0..10) {
@@ -300,7 +303,7 @@ sub make_large_col_crs {
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_large_half);
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
-        my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
+        my $rot      = $is_even ? "0*deg 0*deg ${crs_zrot}*deg" : "0*deg 180*deg ${crs_zrot}*deg";
         my $cap_sign = $is_even ? 1 : -1;
         my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
         my $cmaskZ   = $cap_sign * ($L + 2*$d + $mask_t + 0.01) + $cap_sign * $Z_shift;
@@ -431,7 +434,7 @@ sub make_small_col_crs {
         my $Y_crs    = $Y_layer + (-$layer_half_y + $mask_small_half) + $Y_small_shift;
 
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
-        my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
+        my $rot      = $is_even ? "0*deg 0*deg ${crs_zrot}*deg" : "0*deg 180*deg ${crs_zrot}*deg";
 
         # ========== rotate individual crystal 90° about Z =============
         #$rot = "0*deg 0*deg 90*deg" if ($ti == 3 && $iy == 4);  

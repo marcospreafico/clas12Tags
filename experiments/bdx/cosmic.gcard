@@ -2,7 +2,7 @@
 <option name="DBHOST" value="clasdb.jlab.org"/>
 <option name="DATABASE" value="clas12_simulation"/>
 <option name="HIT_PROCESS_LIST" value="BDX"/>
-<detector name="bdx" factory="TEXT" variation="proposal"/>
+<detector name="bdx" factory="TEXT" variation="standard"/>
 <option name="INTEGRATEDRAW" value="cormo flux scint crs"/>
 <option name="geometry" value="900x600"/>
 <option name="HALL_MATERIAL"   value="Vacuum" />
