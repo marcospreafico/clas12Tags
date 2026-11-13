@@ -324,15 +324,17 @@ sub make_large_col_crs {
             my $bg = $bgo_types{$type}{bg};
             my $bm = $bgo_types{$type}{bm};
             $detector{"type"}       = "G4GenericTrap";
+            # Vertices for each quad must be clockwise when viewed from +z:
+            # bottom-left -> top-left -> top-right -> bottom-right.
             $detector{"dimensions"} = "$L*cm "
                 . (-$bm) . "*cm " . (-$h) . "*cm "
-                . "$bm*cm " . (-$h) . "*cm "
-                . "$bg*cm $h*cm "
                 . (-$bg) . "*cm $h*cm "
+                . "$bg*cm $h*cm "
+                . "$bm*cm " . (-$h) . "*cm "
                 . (-$Bm) . "*cm " . (-$H) . "*cm "
-                . "$Bm*cm " . (-$H) . "*cm "
+                . (-$Bg) . "*cm $H*cm "
                 . "$Bg*cm $H*cm "
-                . (-$Bg) . "*cm $H*cm";
+                . "$Bm*cm " . (-$H) . "*cm";
         } else {
             $detector{"type"}       = "Trd";
             $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
@@ -431,8 +433,8 @@ sub make_small_col_crs {
         my $is_even  = ($iy % 2 == 0) ? 1 : 0;
         my $rot      = $is_even ? "0*deg 0*deg 0*deg" : "0*deg 180*deg 0*deg";
 
-        # rotate this one crystal 90° about Z
-        # $rot = "0*deg 0*deg 180*deg" if ($ti == 4 && $iy == 10);  
+        # ========== rotate individual crystal 90° about Z =============
+        #$rot = "0*deg 0*deg 90*deg" if ($ti == 3 && $iy == 4);  
 
         my $cap_sign = $is_even ? 1 : -1;
         my $capZ     = $cap_sign * ($L + $d)                    + $cap_sign * $Z_shift;
@@ -457,15 +459,17 @@ sub make_small_col_crs {
             my $bg = $bgo_types{$type}{bg};
             my $bm = $bgo_types{$type}{bm};
             $detector{"type"}       = "G4GenericTrap";
+            # Vertices for each quad must be clockwise when viewed from +z:
+            # bottom-left -> top-left -> top-right -> bottom-right.
             $detector{"dimensions"} = "$L*cm "
                 . (-$bm) . "*cm " . (-$h) . "*cm "
-                . "$bm*cm " . (-$h) . "*cm "
-                . "$bg*cm $h*cm "
                 . (-$bg) . "*cm $h*cm "
+                . "$bg*cm $h*cm "
+                . "$bm*cm " . (-$h) . "*cm "
                 . (-$Bm) . "*cm " . (-$H) . "*cm "
-                . "$Bm*cm " . (-$H) . "*cm "
+                . (-$Bg) . "*cm $H*cm "
                 . "$Bg*cm $H*cm "
-                . (-$Bg) . "*cm $H*cm";
+                . "$Bm*cm " . (-$H) . "*cm";
         } else {
             $detector{"type"}       = "Trd";
             $detector{"dimensions"}  = "$b*cm $B*cm $h*cm $H*cm $L*cm";
