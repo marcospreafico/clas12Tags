@@ -22,8 +22,10 @@ git rev-parse HEAD
 
 To update an existing checkout of this branch, use `git pull --ff-only`.
 The original `frederic` branch does not include this BDX implementation.
-Compile a new native release after changing the source revision; queued jobs
-continue to use their frozen runtime archive. Optical `--set` overrides are
+Compile a new native release after changing the simulation sources or geometry
+generator; queued jobs continue to use their frozen runtime archive. Updating
+only planning/output settings does not require rebuilding: the archived worker,
+environment and HIPO validator remain pinned to the verified release. Optical `--set` overrides are
 independent job inputs. The build records Git commit/status and source hashes.
 
 ## Configure and build on ifarm
@@ -71,14 +73,16 @@ the new helper without rebuilding: it invokes their runner by its physical path.
 
 ## Plan many small jobs
 
-Use a new directory on shared storage visible to SWIF2 and compute nodes, not the
-ifarm machine's local `/tmp`. Replace ACCOUNT with your assigned JLab account.
+Campaigns default to **`/volatile/clas12/valla/BDX/WORKFLOW/`**, with one new
+subdirectory per workflow. HIPO results and receipts go under `results/`; inputs,
+`plan.json` and `commands.sh` are stored alongside it. `--output DIRECTORY`
+overrides the campaign directory when needed. Existing directories are rejected.
+Replace ACCOUNT with your assigned JLab account.
 
 ```bash
 python3 farm/plan_bdx.py \
   --release farm/build/TIMESTAMP/release.json \
   --account ACCOUNT --workflow bdx_bgo_scan \
-  --output /SHARED/PATH/bdx_bgo_scan \
   --types 1 2 3 4 5 6 7 8 --distances-mm 20 80 140 200 \
   --events-per-job 5 --jobs-per-point 100 \
   --set light_yield_per_MeV=800
@@ -100,7 +104,9 @@ Resource defaults: 1 core, 2 GB RAM, 2 GB local disk, 30 minutes, partition
 and `--constraint` after measuring representative jobs. High light yields and
 large energy deposits increase optical-bank memory and output size.
 
-Planning submits nothing. Inspect `plan.json` and the readable `commands.sh`.
+Planning submits nothing. Inspect `/volatile/clas12/valla/BDX/bdx_bgo_scan/plan.json` and the readable
+`commands.sh` in the same directory. The plan includes resources, optical settings,
+beam, per-job event counts/seeds and the exact SWIF2 command arguments.
 The campaign snapshots its archive, bootstrap and job inputs. SWIF2 stages these
 with `-input`, launches workers on local scratch, and copies validated results
 with `-output`. `/farm_out/USER/WORKFLOW/` holds per-attempt stdout/stderr.
@@ -108,7 +114,7 @@ with `-output`. `/farm_out/USER/WORKFLOW/` holds per-attempt stdout/stderr.
 ## Submit and monitor
 
 ```bash
-python3 farm/plan_bdx.py --submit-plan /SHARED/PATH/bdx_bgo_scan
+python3 farm/plan_bdx.py --submit-plan /volatile/clas12/valla/BDX/bdx_bgo_scan
 swif2 status bdx_bgo_scan
 ```
 
@@ -135,12 +141,12 @@ source farm/environment.sh "$BDX_RUNTIME_ROOT/farm/ifarm.env"
 
 python3 scripts/analyze_bdx_hipos.py \
   --native --reader "$BDX_RUNTIME_ROOT/build/bdx_optics/bdx_hipo" \
-  --campaign /SHARED/PATH/bdx_bgo_scan \
+  --campaign /volatile/clas12/valla/BDX/bdx_bgo_scan \
   --output /SHARED/PATH/analysis_full_base
 
 python3 scripts/analyze_bdx_hipos.py \
   --native --reader "$BDX_RUNTIME_ROOT/build/bdx_optics/bdx_hipo" \
-  --campaign /SHARED/PATH/bdx_bgo_scan --square-mm 3 \
+  --campaign /volatile/clas12/valla/BDX/bdx_bgo_scan --square-mm 3 \
   --output /SHARED/PATH/analysis_square3mm
 ```
 

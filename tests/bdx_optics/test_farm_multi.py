@@ -1,5 +1,5 @@
 """Offline SWIF2 planning, submission, worker, and pooled event statistics."""
-import copy,importlib.util,json,os,subprocess,sys,tempfile,unittest
+import copy,importlib.util,io,json,os,subprocess,sys,tarfile,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[2]
@@ -55,7 +55,9 @@ class PlannerTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.base=Path(self.temp.name); release=self.base/'build';(release/'runtime/farm').mkdir(parents=True)
-        (release/'runtime.tar.gz').write_bytes(b'test runtime')
+        with tarfile.open(release/'runtime.tar.gz','w:gz') as archive:
+            payload=b'# test\n'; member=tarfile.TarInfo('runtime/farm/start_job.sh');member.size=len(payload)
+            archive.addfile(member,io.BytesIO(payload))
         (release/'runtime/farm/start_job.sh').write_text('# test\n')
         self.release=release/'release.json'
         write_json(self.release,dict(archive=str(release/'runtime.tar.gz'),archive_sha256=sha(release/'runtime.tar.gz'),source=dict(source_sha256={})))
@@ -79,6 +81,42 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual(plan['configuration']['absorption_length_mm'],'10000')
         job=json.loads((self.args.output/plan['jobs'][0]['input']).read_text())
         self.assertIn('bdx_flux',next(v for k,v in job['files'].items() if '__geometry_' in k))
+
+    def test_default_output_is_a_workflow_subdirectory(self):
+        self.assertEqual(plan_bdx.DEFAULT_OUTPUT_BASE,Path('/volatile/clas12/valla/BDX'))
+        self.args.output=None
+        base=self.base/'volatile'
+        with patch.object(plan_bdx,'DEFAULT_OUTPUT_BASE',base),patch('subprocess.run') as run:
+            plan=plan_bdx.prepare(self.args)
+        run.assert_not_called()
+        output=base/'bdx_test'
+        self.assertTrue((output/'plan.json').is_file())
+        self.assertEqual(plan['output_directory'],str(output.resolve()))
+        command=plan['commands'][1]
+        destinations=[command[i+2] for i,value in enumerate(command) if value=='-output']
+        self.assertTrue(all(p.startswith('file:'+str(output.resolve()/'results')+'/') for p in destinations))
+        self.assertEqual(plan['resources']['account'],'test_account')
+
+    def test_explicit_output_override_is_preserved(self):
+        plan=plan_bdx.prepare(self.args)
+        self.assertEqual(Path(plan['output_directory']),self.args.output.resolve())
+
+    def test_control_script_change_can_reuse_frozen_release(self):
+        build=json.loads(self.release.read_text())
+        build['source']['source_sha256']['farm/plan_bdx.py']='old-control-script'
+        write_json(self.release,build)
+        # Even a modified unpacked worker must not enter a new campaign.
+        (self.release.parent/'runtime/farm/start_job.sh').write_text('mutated unpacked copy')
+        plan_bdx.prepare(self.args)
+        self.assertEqual((self.args.output/'inputs/start_job.sh').read_text(),'# test\n')
+
+    def test_changed_simulation_source_still_requires_build(self):
+        build=json.loads(self.release.read_text())
+        build['source']['source_sha256']['source/SConstruct']='different-simulation-source'
+        write_json(self.release,build)
+        with self.assertRaisesRegex(ValueError,'rebuild'):
+            plan_bdx.prepare(self.args)
+        self.assertFalse(self.args.output.exists())
 
     def test_submission_marker_and_input_changes(self):
         plan=plan_bdx.prepare(self.args)
