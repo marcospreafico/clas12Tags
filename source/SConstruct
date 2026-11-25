@@ -96,7 +96,7 @@ phys_sources = Split("""
 	physics/GammaNuclearPhysics.cc
 	physics/PhysicsListMessenger.cc
 	physics/G4DarkMatter.cc
-	physics/G4LDMEleSCattering.cc
+	physics/G4LDMEleScattering.cc
 	physics/G4DarkScalar.cc
 	physics/G4MuonScalarProduction.cc""")
 env.Library(source = phys_sources, target = lib_dir + "/gphysics")
