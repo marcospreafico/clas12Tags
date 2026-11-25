@@ -120,7 +120,7 @@ def main(argv=None):
     files=[SOURCE,ROOT/'source/src/BdxCrystalOptics.cc',ROOT/'source/src/BdxCrystalOptics.h',
            ROOT/'source/src/MDetectorConstruction.cc',ROOT/'source/src/MSteppingAction.cc',
            ROOT/'source/src/MEventAction.cc',ROOT/'source/physics/PhysicsList.cc',
-           Path(__file__),ROOT/'scripts/bdx_geometry.py',ROOT/'scripts/bdx_data.py',ROOT/'scripts/bdx_hipo.cc',ROOT/'source/src/BdxOpticalSchema.h',
+           Path(__file__).resolve(),ROOT/'scripts/bdx_geometry.py',ROOT/'scripts/bdx_data.py',ROOT/'scripts/bdx_hipo.cc',ROOT/'source/src/BdxOpticalSchema.h',
            ROOT/'source/output/hipoSchemas.cc',ROOT/'source/output/hipo_output.h',ROOT/'source/output/hipo_output.cc',
            ROOT/'scripts/build_bdx_optics.sh',ROOT/'source/SConstruct',
            ROOT/'source/output/outputFactory.h',ROOT/'source/output/outputFactory.cc']

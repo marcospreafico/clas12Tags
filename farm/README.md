@@ -46,6 +46,29 @@ or Docker object files and preserving any existing local executable. The archive
 contains the private GEMC, HIPO checker/reducer, worker, environment and source.
 `release.json` records source, binary, archive and environment hashes.
 
+## Small native test after compilation
+
+Run the helper as a child shell; do not source it into your interactive session:
+
+```bash
+bash farm/test_bdx.sh
+```
+
+It selects the latest completed native release, canonicalizes paths such as
+`/work` symlinks, loads modules in the child process, and runs eight test events
+(types 1/8, distances 20/200 mm, two events per point, 100 photons/MeV). Every HIPO
+is checked automatically. No SWIF2 jobs are submitted. To select another release:
+
+```bash
+BDX_RELEASE_JSON=/PATH/TO/release.json bash farm/test_bdx.sh
+```
+
+The current environment loader preserves the caller's shell options; earlier
+versions enabled `errexit` and `nounset`, which could terminate an SSH login shell
+on errors in interactive completion. After reconnecting, update the checkout
+before sourcing the loader again. Existing compiled releases can be tested with
+the new helper without rebuilding: it invokes their runner by its physical path.
+
 ## Plan many small jobs
 
 Use a new directory on shared storage visible to SWIF2 and compute nodes, not the
