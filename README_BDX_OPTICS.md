@@ -1,5 +1,14 @@
 # Ottica dei cristalli BGO BDX
 
+Repository: [marcospreafico/clas12Tags](https://github.com/marcospreafico/clas12Tags/tree/optical_photons_simulation),
+ramo **`optical_photons_simulation`**, derivato dal ramo `frederic` al commit
+`1d2313f8cc701e43bf461bee44ea12f43c7d402d`. Per clonarlo:
+
+```bash
+git clone --branch optical_photons_simulation --single-branch \
+  https://github.com/marcospreafico/clas12Tags.git clas12Tags
+```
+
 Simulazione GEMC dei singoli cristalli BGO, con otto variation `bgo1` ... `bgo8`,
 estratte da `experiments/bdx/geometry_crs60.pl` del ramo `frederic`.
 I vertici `G4GenericTrap` originali sono conservati. Tutti i tipi sono lunghi

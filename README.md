@@ -1,3 +1,17 @@
+# BDX optical photon simulation
+
+This branch, `optical_photons_simulation`, contains the BDX BGO optical study,
+full-base photon collection, HIPO output and analysis, and small-job JLab SWIF2 production.
+
+- [BDX optical simulation and analysis](README_BDX_OPTICS.md)
+- [Native ifarm build and SWIF2 jobs](farm/README.md)
+- [Optical HIPO banks](experiments/bdx_optics/OUTPUT_BANKS.md)
+
+It starts from `marcospreafico/clas12Tags:frederic` at commit
+`1d2313f8cc701e43bf461bee44ea12f43c7d402d`; the original repository documentation follows.
+
+---
+
 # The clas12Tags repository
 
 The `clas12Tags` repository serves as the simulation resource for the CLAS12 experiments 

@@ -6,24 +6,25 @@ with Geant4 10.7.4, then share the frozen release among many jobs. Native JLab
 modules/accounts must be checked on your own account; local container tests do
 not establish remote access or SWIF2 credentials.
 
-## Transfer this modified checkout
+## Clone the BDX branch on ifarm
 
-The upstream `frederic` branch alone does not contain these optical changes.
-Transfer this working tree, including untracked source/scripts, while excluding
-local build products and previous production data. Example from the Mac:
+The BDX implementation is versioned in branch `optical_photons_simulation` of
+`marcospreafico/clas12Tags`, starting from the original `frederic` baseline
+`1d2313f8cc701e43bf461bee44ea12f43c7d402d`.
 
 ```bash
-rsync -av --exclude=.git --exclude=build --exclude='farm/build' \
-  --exclude='*.o' --exclude='*.a' --exclude='*.hipo' --exclude='*.pyc' \
-  --exclude=.sconsign.dblite --exclude='source/gemc' --exclude='farm/ifarm.env' \
-  /Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags/ \
-  USER@ifarm.jlab.org:/SHARED/PATH/clas12Tags/
+cd /SHARED/PATH
+git clone --branch optical_photons_simulation --single-branch \
+  https://github.com/marcospreafico/clas12Tags.git clas12Tags
+cd clas12Tags
+git rev-parse HEAD
 ```
 
-The build script records source hashes even when the checkout is dirty or `.git`
-is absent after transfer. Git metadata is retained when available.
-Never use only a clean upstream clone. Source changes after building require a new
-release before planning; `--set` optics overrides are independent job inputs.
+To update an existing checkout of this branch, use `git pull --ff-only`.
+The original `frederic` branch does not include this BDX implementation.
+Compile a new native release after changing the source revision; queued jobs
+continue to use their frozen runtime archive. Optical `--set` overrides are
+independent job inputs. The build records Git commit/status and source hashes.
 
 ## Configure and build on ifarm
 
