@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "events": 2,
+  "generated": 100001,
+  "full_base": 100000,
+  "square_3mm": 50000,
+  "retained_zero_arrival_events": 1,
+  "production_unchanged": true
+}

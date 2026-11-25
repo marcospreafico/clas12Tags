@@ -1,0 +1,2 @@
+crystal_type,distance_mm,events,edep_MeV,generated_scint,arrived_scint,collection_efficiency,efficiency_event_sem,efficiency_photon_wilson68_low,efficiency_photon_wilson68_high,arrived_per_MeV,arrived_per_MeV_event_sem,generated_per_MeV,arrived_per_MeV_divided_by_input_yield,edep_axial_distance_mm,max_optical_steps
+8,120.0,2,77.3727695947,658585,6202,0.009417159516235566,0.00018508610939184297,0.00929888779656423,0.009536921042372522,80.15739946350368,1.6524826307094915,8511.844715522666,0.009430282289823962,119.9998232975233,744

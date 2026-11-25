@@ -1,8 +1,13 @@
 from init_env import init_environment
+import os
+no_evio = os.environ.get("BDX_NO_EVIO") == "1"
+lib_dir = "../build/bdx_optics/lib" if no_evio else "lib"
 
 # adding ccdb as temporary dependency
 # will be removed once the hit process routines are plugins
-env = init_environment("qt5 geant4 clhep xercesc ccdb mlibrary cadmesh hipo c12bfields root evio")
+env = init_environment("qt5 geant4 clhep xercesc ccdb mlibrary cadmesh hipo c12bfields root" + ("" if no_evio else " evio"))
+if no_evio:
+    env.Append(CPPDEFINES=["BDX_NO_EVIO"])
 env.Append(CXXFLAGS=['-std=c++17'])
 
 # addressing shortcoming of geant4-config 10.7.4 not returning all libraries
@@ -25,7 +30,7 @@ materials_sources = Split("""
 	materials/mysql_materials.cc
 	materials/sqlite_materials.cc
 	materials/text_materials.cc""")
-env.Library(source = materials_sources, target = "lib/gmaterials")
+env.Library(source = materials_sources, target = lib_dir + "/gmaterials")
 
 # Mirrors
 env.Append(CPPPATH = 'mirrors')
@@ -34,7 +39,7 @@ mirrors_sources = Split("""
 	mirrors/mysql_mirrors.cc
 	mirrors/sqlite_mirrors.cc
 	mirrors/text_mirrors.cc""")
-env.Library(source = mirrors_sources, target = "lib/gmirrors")
+env.Library(source = mirrors_sources, target = lib_dir + "/gmirrors")
 
 
 # Parameters
@@ -43,7 +48,7 @@ parameters_sources = Split("""
 	parameters/parameter_factory.cc
 	parameters/mysql_parameters.cc
 	parameters/text_parameters.cc""")
-env.Library(source = parameters_sources, target = "lib/gparameters")
+env.Library(source = parameters_sources, target = lib_dir + "/gparameters")
 
 
 # Utilities
@@ -54,7 +59,7 @@ util_sources = Split("""
 	utilities/lStdHep.cc
 	utilities/lXDR.cc
 	utilities/gemcOptions.cc""")
-env.Library(source = util_sources, target = "lib/gutilities")
+env.Library(source = util_sources, target = lib_dir + "/gutilities")
 
 
 # Detector
@@ -69,7 +74,7 @@ det_sources = Split("""
 	detector/sqlite_cad_factory.cc
 	detector/clara_det_factory.cc
 	detector/text_det_factory.cc""")
-env.Library(source = det_sources, target = "lib/gdetector")
+env.Library(source = det_sources, target = lib_dir + "/gdetector")
 
 
 # Sensitivity
@@ -81,7 +86,7 @@ sensi_sources = Split("""
 	sensitivity/backgroundHits.cc
 	sensitivity/HitProcess.cc
 	sensitivity/sensitiveID.cc""")
-env.Library(source = sensi_sources, target = "lib/gsensitivity")
+env.Library(source = sensi_sources, target = lib_dir + "/gsensitivity")
 
 
 # Physics
@@ -94,7 +99,7 @@ phys_sources = Split("""
 	physics/G4LDMEleSCattering.cc
 	physics/G4DarkScalar.cc
 	physics/G4MuonScalarProduction.cc""")
-env.Library(source = phys_sources, target = "lib/gphysics")
+env.Library(source = phys_sources, target = lib_dir + "/gphysics")
 
 # Fields
 env.Append(CPPPATH = 'fields')
@@ -110,7 +115,7 @@ field_sources = Split("""
 	fields/symmetries/cylindrical.cc
 	fields/symmetries/phi-segmented.cc
 	fields/symmetries/cartesian_3d.cc""")
-env.Library(source = field_sources, target = "lib/gfields")
+env.Library(source = field_sources, target = lib_dir + "/gfields")
 
 
 # Hit Processes
@@ -162,7 +167,7 @@ hitp_sources = Split("""
 	hitprocess/HPS/ECAL_hitprocess.cc
 	hitprocess/HPS/SVT_hitprocess.cc
 	hitprocess/HPS/muon_hodo_hitprocess.cc""")
-env.Library(source = hitp_sources, target = "lib/ghitprocess")
+env.Library(source = hitp_sources, target = lib_dir + "/ghitprocess")
 
 
 # Output
@@ -172,11 +177,12 @@ output_sources = Split("""
 	
 	output/hipo_output.cc
 	output/hipoSchemas.cc
-	output/evio_output.cc
 	output/txt_output.cc
 	output/txt_simple_output.cc
 	output/gbank.cc""")
-env.Library(source = output_sources, target = "lib/goutput")
+if not no_evio:
+    output_sources.append("output/evio_output.cc")
+env.Library(source = output_sources, target = lib_dir + "/goutput")
 
 # GUI
 env.Append(CPPPATH = 'gui/src')
@@ -195,7 +201,7 @@ gui_sources = Split("""
 	gui/src/physicsListGui.cc
 	gui/src//gtrigger.cc
 	utilities/graph.cc""")
-env.Library(source = gui_sources, target = "lib/ggui")
+env.Library(source = gui_sources, target = lib_dir + "/ggui")
 
 
 # gemc
@@ -209,10 +215,16 @@ gemc_sources = Split("""
 	src/MEventAction.cc
 	src/MPrimaryGeneratorAction.cc
 	src/ActionInitialization.cc
+	src/BdxCrystalOptics.cc
 	src/MSteppingAction.cc""")
 
-env.Append(LIBPATH = ['lib'])
-env.Prepend(LIBS =  ['gmaterials', 'gmirrors', 'gparameters', 'gutilities', 'gdetector', 'gsensitivity', 'gphysics', 'gfields', 'ghitprocess', 'goutput', 'ggui'])
+env.Append(LIBPATH = [lib_dir])
+gemc_libs = ['gmaterials', 'gmirrors', 'gparameters', 'gutilities', 'gdetector', 'gsensitivity', 'gphysics', 'gfields', 'ghitprocess', 'goutput', 'ggui']
+if env['PLATFORM'] != 'darwin':
+    env.Prepend(LIBS=gemc_libs)
+    env['_LIBFLAGS'] = '-Wl,--start-group ' + env['_LIBFLAGS'] + ' -Wl,--end-group'
+else:
+    env.Prepend(LIBS=gemc_libs)
 env.Program(source = gemc_sources, target = "gemc")
 
 

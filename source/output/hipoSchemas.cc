@@ -1,6 +1,7 @@
 // gemc headers
 #include "outputFactory.h"
 #include "hipoSchemas.h"
+#include "../src/BdxCrystalOptics.h"
 
 HipoSchema::HipoSchema() {
 
@@ -294,6 +295,7 @@ void outputContainer::initializeHipo(bool openFile) {
             hipoWriter->getDictionary().addSchema(schema.second);
             // hipoWriter->addUserConfig("gemc","{\"version\": \"4.4.2\", \"beam\": \"e-,10.6 GeV\"}");
         }
+        bdxoptics::RegisterHipoSchemas(hipoWriter->getDictionary());
     } else {
         hipoWriter->open(outFile.c_str());
     }

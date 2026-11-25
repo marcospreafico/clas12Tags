@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-24",
+  "status": "passed",
+  "absorption_length_mm": 10000,
+  "geometry": {
+    "types": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "distances_mm": [
+      20,
+      200
+    ],
+    "events_per_point": 2,
+    "light_yield_per_MeV": 80,
+    "source_sha256": "04d3f3284707593209545b2a9a41a54326736258ff212ee2d571dd0b34ba0218"
+  },
+  "all_types_scan": {
+    "events": 32,
+    "generated_scint": 107474,
+    "full_base_arrivals": 83634,
+    "square_3mm_arrivals": 274,
+    "bulk_absorbed": 3927,
+    "surface_absorbed": 19913,
+    "escaped": 0
+  },
+  "optical_transport_checks": 17,
+  "python_checks": 6,
+  "relocation_cases": 48067,
+  "large_hipo_event": {
+    "bytes": 16000472,
+    "arrivals": 100000,
+    "zero_arrival_event_retained": true
+  },
+  "production_separate_from_analysis": true,
+  "postselection_changes_production": false,
+  "final_writer_regression": {
+    "type": 1,
+    "distance_mm": 20,
+    "events": 10,
+    "light_yield_per_MeV": 800,
+    "seed": 2010314138,
+    "flux_rows": 253743,
+    "raster_rows": 0
+  },
+  "notes": [
+    "Eight-type scan used the identical optical model before suppression of unused CLAS12 raster output.",
+    "Final ten-event run verifies the writer with CLAS12 raster calibration/output disabled.",
+    "Low-statistics scans verify software; they are not final experimental predictions."
+  ]
+}

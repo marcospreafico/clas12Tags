@@ -1,0 +1,3 @@
+# Generated validation fixtures retain exact bytes for recorded checksums.
+# CSV writers use CRLF; Matplotlib SVG paths may contain trailing spaces.
+reference/bdx_optics/validation/** -text -whitespace

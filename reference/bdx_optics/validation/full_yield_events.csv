@@ -1,0 +1,3 @@
+crystal_type,distance_mm,seed,event,primary_z_mm,nominal_distance_mm,edep_MeV,edep_axial_distance_mm,edep_euclidean_distance_mm,generated_scint,arrived_scint,generated_cherenkov,arrived_cherenkov,injected_optical,arrived_injected,bulk_absorbed,surface_absorbed,escaped,reflections,diffuse_reflections,specular_reflections,max_optical_steps
+8,120.0,1856652479,0,0,120,38.0510276218,119.998841455,120.65338699,324201,3114,0,0,0,0,0,321087,0,15709093,7947477,7761616,744
+8,120.0,1856652479,1,0,120,39.3217419729,120.000773411,120.665779876,334384,3088,0,0,0,0,0,331296,0,16266386,8222308,8044078,628

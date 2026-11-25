@@ -4,6 +4,8 @@ using namespace std;
 
 // gemc headers
 #include "PhysicsList.h"
+#include "../src/BdxCrystalOptics.h"
+#include "G4OpticalParameters.hh"
 #include "PhysicsListMessenger.h"
 #include "string_utilities.h"
 
@@ -397,7 +399,8 @@ void PhysicsList::cookPhysics()
 		G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
 		// enable Mie scattering (do not think it is enabled by default)
 		// make this optional?
-		opticalPhysics->Configure(kMieHG, true);
+		if(bdxoptics::Enabled()) bdxoptics::ConfigurePhysics();
+		else opticalPhysics->Configure(kMieHG, true);
 		
 		// this was deprecated?
 		// Method G4OpticalPhysics::SetWLSTimeProfile is deprecated.
@@ -517,6 +520,8 @@ void PhysicsList::ConstructProcess()
 
 		for(size_t i=0; i<g4HadronicPhysics.size(); i++)
 			g4HadronicPhysics[i]->ConstructProcess();
+
+        bdxoptics::InstallBoundaryProcess();
 
 		// sync radiation
 		G4SynchrotronRadiation*      fSync    = nullptr;

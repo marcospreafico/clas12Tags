@@ -1,0 +1,36 @@
+{
+  "normalisation": "ratio of total scintillation arrivals to total generated scintillation photons",
+  "uncertainty": "event cluster SEM; photon Wilson68 interval is counting precision only",
+  "units": {
+    "distance": "mm",
+    "energy": "MeV"
+  },
+  "analysis_code_sha256": "4a5fc1943999a05be51662a005fcf7a20a889afbe7eb7be5bc9291ad09d634af",
+  "plotting_library": "matplotlib",
+  "plotting_version": "3.10.8",
+  "campaign_sha256": "f23bffe3623b7048216e7c451d2606eed05920b124b90d972e133fde33043d14",
+  "points": [
+    {
+      "crystal_type": 1,
+      "distance_mm": 20.0,
+      "events": 10,
+      "edep_MeV": 433.1953414613,
+      "generated_scint": 346785,
+      "arrived_scint": 5555,
+      "collection_efficiency": 0.01601857058407947,
+      "efficiency_event_sem": 0.00012302148361672554,
+      "efficiency_photon_wilson68_low": 0.015806767844840055,
+      "efficiency_photon_wilson68_high": 0.016233164563042617,
+      "arrived_per_MeV": 12.8233142610936,
+      "arrived_per_MeV_event_sem": 0.10534670650411164,
+      "generated_per_MeV": 800.5279992859305,
+      "arrived_per_MeV_divided_by_input_yield": 0.016029142826367,
+      "edep_axial_distance_mm": 19.98622922637927,
+      "max_optical_steps": 589,
+      "boundary_repairs": 0,
+      "max_boundary_shift_mm": 1.00000000223e-06,
+      "secondary_birth_repairs": 0,
+      "max_birth_shift_mm": 0.0
+    }
+  ]
+}

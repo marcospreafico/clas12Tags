@@ -22,6 +22,7 @@
 
 // gemc headers
 #include "MDetectorConstruction.h"
+#include "BdxCrystalOptics.h"
 
 // mlibrary
 #include "gstring.h"
@@ -209,6 +210,13 @@ G4VPhysicalVolume *MDetectorConstruction::Construct() {
         }
     }
 
+    // Dedicated BGO optical study; inactive for every upstream detector.
+    if(bdxoptics::Enabled()) {
+        const auto crystal=hallMap->find("bdx_bgo"), sensor=hallMap->find("bdx_flux");
+        bdxoptics::Construct((*hallMap)["root"].GetPhysical(),
+            crystal==hallMap->end()?nullptr:crystal->second.GetPhysical(),
+            sensor==hallMap->end()?nullptr:sensor->second.GetPhysical());
+    }
     // build mirrors
     buildMirrors();
 

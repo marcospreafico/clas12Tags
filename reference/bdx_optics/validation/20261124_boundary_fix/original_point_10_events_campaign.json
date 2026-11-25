@@ -1,0 +1,506 @@
+{
+  "format": "BDX_OPTICS_CAMPAIGN_V1",
+  "created_utc": "20261124T163851839430Z",
+  "upstream_commit": "1d2313f8cc701e43bf461bee44ea12f43c7d402d",
+  "geometry": {
+    "source": "experiments/bdx/geometry_crs60.pl",
+    "source_sha256": "04d3f3284707593209545b2a9a41a54326736258ff212ee2d571dd0b34ba0218",
+    "upstream_commit": "1d2313f8cc701e43bf461bee44ea12f43c7d402d",
+    "units": "mm; lengths are half dimensions unless stated otherwise",
+    "sipm_side_mm": 3,
+    "types": {
+      "1": {
+        "half_dimensions_mm": {
+          "Bg": 24.1,
+          "Bm": 19.75,
+          "H": 24.8,
+          "bg": 11.899999999999999,
+          "bm": 9.8,
+          "h": 12.2,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -12.2
+          ],
+          [
+            -11.899999999999999,
+            12.2
+          ],
+          [
+            11.899999999999999,
+            12.2
+          ],
+          [
+            9.8,
+            -12.2
+          ],
+          [
+            -19.75,
+            -24.8
+          ],
+          [
+            -24.1,
+            24.8
+          ],
+          [
+            24.1,
+            24.8
+          ],
+          [
+            19.75,
+            -24.8
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 3.0,
+        "sensor_center_mm": [
+          0,
+          0.8200684150513116,
+          120.0
+        ]
+      },
+      "2": {
+        "half_dimensions_mm": {
+          "Bg": 26.299999999999997,
+          "Bm": 21.95,
+          "H": 26.549999999999997,
+          "bg": 11.7,
+          "bm": 9.8,
+          "h": 11.899999999999999,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -11.899999999999999
+          ],
+          [
+            -11.7,
+            11.899999999999999
+          ],
+          [
+            11.7,
+            11.899999999999999
+          ],
+          [
+            9.8,
+            -11.899999999999999
+          ],
+          [
+            -21.95,
+            -26.549999999999997
+          ],
+          [
+            -26.299999999999997,
+            26.549999999999997
+          ],
+          [
+            26.299999999999997,
+            26.549999999999997
+          ],
+          [
+            21.95,
+            -26.549999999999997
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 3.5,
+        "sensor_center_mm": [
+          0,
+          0.7978756476683934,
+          120.0
+        ]
+      },
+      "3": {
+        "half_dimensions_mm": {
+          "Bg": 28.2,
+          "Bm": 24.35,
+          "H": 26.349999999999998,
+          "bg": 11.35,
+          "bm": 9.8,
+          "h": 10.649999999999999,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -10.649999999999999
+          ],
+          [
+            -11.35,
+            10.649999999999999
+          ],
+          [
+            11.35,
+            10.649999999999999
+          ],
+          [
+            9.8,
+            -10.649999999999999
+          ],
+          [
+            -24.35,
+            -26.349999999999998
+          ],
+          [
+            -28.2,
+            26.349999999999998
+          ],
+          [
+            28.2,
+            26.349999999999998
+          ],
+          [
+            24.35,
+            -26.349999999999998
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 3.75,
+        "sensor_center_mm": [
+          0,
+          0.6434982556295589,
+          120.0
+        ]
+      },
+      "4": {
+        "half_dimensions_mm": {
+          "Bg": 30.85,
+          "Bm": 26.7,
+          "H": 33.25,
+          "bg": 11.15,
+          "bm": 9.8,
+          "h": 12.25,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -12.25
+          ],
+          [
+            -11.15,
+            12.25
+          ],
+          [
+            11.15,
+            12.25
+          ],
+          [
+            9.8,
+            -12.25
+          ],
+          [
+            -26.7,
+            -33.25
+          ],
+          [
+            -30.85,
+            33.25
+          ],
+          [
+            30.85,
+            33.25
+          ],
+          [
+            26.7,
+            -33.25
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 5.0,
+        "sensor_center_mm": [
+          0,
+          0.7992325514045763,
+          120.0
+        ]
+      },
+      "5": {
+        "half_dimensions_mm": {
+          "Bg": 32.35,
+          "Bm": 29.3,
+          "H": 31.400000000000002,
+          "bg": 10.8,
+          "bm": 9.8,
+          "h": 10.4,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -10.4
+          ],
+          [
+            -10.8,
+            10.4
+          ],
+          [
+            10.8,
+            10.4
+          ],
+          [
+            9.8,
+            -10.4
+          ],
+          [
+            -29.3,
+            -31.400000000000002
+          ],
+          [
+            -32.35,
+            31.400000000000002
+          ],
+          [
+            32.35,
+            31.400000000000002
+          ],
+          [
+            29.3,
+            -31.400000000000002
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 5.0,
+        "sensor_center_mm": [
+          0,
+          0.517815625844823,
+          120.0
+        ]
+      },
+      "6": {
+        "half_dimensions_mm": {
+          "Bg": 33.35,
+          "Bm": 31.349999999999998,
+          "H": 30.4,
+          "bg": 10.4,
+          "bm": 9.8,
+          "h": 9.399999999999999,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -9.399999999999999
+          ],
+          [
+            -10.4,
+            9.399999999999999
+          ],
+          [
+            10.4,
+            9.399999999999999
+          ],
+          [
+            9.8,
+            -9.399999999999999
+          ],
+          [
+            -31.349999999999998,
+            -30.4
+          ],
+          [
+            -33.35,
+            30.4
+          ],
+          [
+            33.35,
+            30.4
+          ],
+          [
+            31.349999999999998,
+            -30.4
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 5.0,
+        "sensor_center_mm": [
+          0,
+          0.3132405976300881,
+          120.0
+        ]
+      },
+      "7": {
+        "half_dimensions_mm": {
+          "Bg": 33.7,
+          "Bm": 32.75,
+          "H": 29.0,
+          "bg": 10.049999999999999,
+          "bm": 9.8,
+          "h": 8.7,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -8.7
+          ],
+          [
+            -10.049999999999999,
+            8.7
+          ],
+          [
+            10.049999999999999,
+            8.7
+          ],
+          [
+            9.8,
+            -8.7
+          ],
+          [
+            -32.75,
+            -29.0
+          ],
+          [
+            -33.7,
+            29.0
+          ],
+          [
+            33.7,
+            29.0
+          ],
+          [
+            32.75,
+            -29.0
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 4.8335,
+        "sensor_center_mm": [
+          0,
+          0.138199147228493,
+          120.0
+        ]
+      },
+      "8": {
+        "half_dimensions_mm": {
+          "Bg": 33.4,
+          "Bm": 33.4,
+          "H": 28.75,
+          "bg": 9.8,
+          "bm": 9.8,
+          "h": 8.45,
+          "L": 120.0
+        },
+        "vertices_mm": [
+          [
+            -9.8,
+            -8.45
+          ],
+          [
+            -9.8,
+            8.45
+          ],
+          [
+            9.8,
+            8.45
+          ],
+          [
+            9.8,
+            -8.45
+          ],
+          [
+            -33.4,
+            -28.75
+          ],
+          [
+            -33.4,
+            28.75
+          ],
+          [
+            33.4,
+            28.75
+          ],
+          [
+            33.4,
+            -28.75
+          ]
+        ],
+        "half_length_mm": 120.0,
+        "source_theta_deg_unused": 4.8335,
+        "sensor_center_mm": [
+          0,
+          0.0,
+          120.0
+        ]
+      }
+    }
+  },
+  "configuration": {
+    "light_yield_per_MeV": "800",
+    "refractive_index": "2.15",
+    "decay_time_ns": "300",
+    "wavelength_nm": "480",
+    "absorption_length_mm": "0",
+    "wrap_reflectivity": "0.98",
+    "wrap_model": "paint",
+    "diffuse_length_mm": "40",
+    "transition_length_mm": "100",
+    "specular_length_mm": "100",
+    "cherenkov": "0",
+    "boundary_push_mm": "0.000001"
+  },
+  "source_sha256": {
+    "experiments/bdx/geometry_crs60.pl": "04d3f3284707593209545b2a9a41a54326736258ff212ee2d571dd0b34ba0218",
+    "source/src/BdxCrystalOptics.cc": "3b6ee5056420fa64c49f6b39460c3041a58fca8ff1e6b782160e0d10b071a013",
+    "source/src/BdxCrystalOptics.h": "375bf1915a89df08a1e5156d4d1b7b68c60ebd428002abb0792d0e8f218227c7",
+    "source/src/BdxCrystalOptics.o": "fa0137857d7b06912a535b6bd7949c041d6417044771be9016ed0e83977e5fd0",
+    "source/src/MDetectorConstruction.cc": "8ec3f9ea789a79dbbb789369a192ef536b876b411dbefdb5af2eb3e6b262c509",
+    "source/src/MSteppingAction.cc": "8458ac603aeee8ac8ae854a7e1c5ab52271d3b075b77dc0f56184e7abe289cab",
+    "source/src/MEventAction.cc": "6d6df6e7464a38db9775c127328f3354ba61785de21726f2fbaf73edb628567e",
+    "source/physics/PhysicsList.cc": "4315f2f97ce8c4da40c9d4b8357edf145c8b27809728f5227729b50c6dd3a525",
+    "scripts/run_bdx_optics.py": "abc5a3c670f99090c16efb1ad18065b890d422b885e4e20cb0cd8e62da353c66",
+    "scripts/bdx_geometry.py": "014c2edb3f297e677c8f03ffbeb0493b4fb9a4d0ba0f1f1e883926d608dcb658",
+    "scripts/analyze_bdx_optics.py": "4a5fc1943999a05be51662a005fcf7a20a889afbe7eb7be5bc9291ad09d634af",
+    "scripts/build_bdx_optics.sh": "dd9656a7ab0d96451f86374efcf11c0cad2275d244dfc2379a0ff8ea2f07e694",
+    "source/SConstruct": "812b0fd47848d2988819f030a95078c158136fa17e9d5613d8cdb51e47431dec",
+    "source/output/outputFactory.h": "81937838c0cba49b4b4d7dedbb91c26143ee155a1a50689f5987caf42e0173ed",
+    "source/output/outputFactory.cc": "902c8c14bc86c3e95b2b4d0323f174231de210b2c015ff8764a85ebfd7f1c88b"
+  },
+  "gemc_sha256": "f02882ef00a4e4f5660d31347339836b4503b0aab239865fc00cb68ab0e95f5b",
+  "git_status": " M .gitignore\n M source/SConstruct\n M source/output/outputFactory.cc\n M source/output/outputFactory.h\n M source/physics/PhysicsList.cc\n M source/src/MDetectorConstruction.cc\n M source/src/MEventAction.cc\n M source/src/MSteppingAction.cc\n?? README_BDX_OPTICS.md\n?? experiments/bdx_optics/\n?? reference/\n?? requirements-bdx-optics.txt\n?? scripts/\n?? source/src/BdxCrystalOptics.cc\n?? source/src/BdxCrystalOptics.h\n?? tests/\n",
+  "image": "jeffersonlab/gemc:dev-almalinux94@sha256:4dd5fa8c6714a7f9241106c07edb32f6c3e2e645ec55958b508b8f0d5f95ac74",
+  "particle": "mu-",
+  "momentum_GeV": 4,
+  "seed": 20261123,
+  "events_per_point": 10,
+  "status": "completed",
+  "runs": [
+    {
+      "crystal_type": 1,
+      "distance_mm": 20.0,
+      "seed": 2010314138,
+      "directory": "bgo1/d20mm",
+      "status": "completed",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--platform",
+        "linux/amd64",
+        "--entrypoint",
+        "/bin/bash",
+        "-v",
+        "/Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags:/work/clas12Tags",
+        "-w",
+        "/work/clas12Tags/build/bdx_optics/regression_user_800_final/bgo1/d20mm",
+        "-e",
+        "BDX_OPTICS_CONFIG=/work/clas12Tags/build/bdx_optics/regression_user_800_final/bgo1/d20mm/optics.conf",
+        "-e",
+        "BDX_OPTICS_CSV=/work/clas12Tags/build/bdx_optics/regression_user_800_final/bgo1/d20mm/events.csv",
+        "jeffersonlab/gemc:dev-almalinux94@sha256:4dd5fa8c6714a7f9241106c07edb32f6c3e2e645ec55958b508b8f0d5f95ac74",
+        "-lc",
+        "module load ccdb/1.99.6 hipo/4.5.0; export GEMC=/work/clas12Tags GEMC_DATA_DIR=/work/clas12Tags; exec /work/clas12Tags/source/gemc \"$@\"",
+        "bdx-run",
+        "run.gcard",
+        "-N=10",
+        "-RANDOM=2010314138",
+        "-BEAM_P=mu-,4*GeV,90*deg,0*deg",
+        "-BEAM_V=(-100,0,100)mm"
+      ],
+      "events_sha256": "94e9a0e5b89b81d514a0501bb3782c20aa89239719e1aa91ef2bd24a0573779a"
+    }
+  ],
+  "image_id": "sha256:4dd5fa8c6714a7f9241106c07edb32f6c3e2e645ec55958b508b8f0d5f95ac74"
+}

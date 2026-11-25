@@ -1,0 +1,143 @@
+{
+  "format": "BDX_MULTI_HIPO_ANALYSIS_V1",
+  "partial": false,
+  "missing": [],
+  "selection": {
+    "area": "square",
+    "square_side_mm": 3.0,
+    "origin": "scintillation"
+  },
+  "configuration": {
+    "absorption_length_mm": 10000,
+    "boundary_push_mm": 1e-06,
+    "cherenkov": 0,
+    "collector": 1,
+    "decay_time_ns": 300,
+    "diffuse_length_mm": 40,
+    "light_yield_per_MeV": 80,
+    "refractive_index": 2.15,
+    "schema_version": 2,
+    "specular_length_mm": 100,
+    "transition_length_mm": 100,
+    "wavelength_nm": 480,
+    "wrap_model": 1,
+    "wrap_reflectivity": 0.98
+  },
+  "geometry": {
+    "1": {
+      "half_length_mm": 120,
+      "Bg_mm": 24.1,
+      "Bm_mm": 19.75,
+      "H_mm": 24.8,
+      "bg_mm": 11.9,
+      "bm_mm": 9.8,
+      "h_mm": 12.2,
+      "center_y_mm": 0.8200684150513116,
+      "plane_z_mm": 120
+    },
+    "8": {
+      "half_length_mm": 120,
+      "Bg_mm": 33.4,
+      "Bm_mm": 33.4,
+      "H_mm": 28.75,
+      "bg_mm": 9.8,
+      "bm_mm": 9.8,
+      "h_mm": 8.45,
+      "center_y_mm": 0,
+      "plane_z_mm": 120
+    }
+  },
+  "runtime_sha256": "08d8269dbb82eb216decaca9e168965888fdbd693f1e4e7f48393c9548db646a",
+  "sources": [
+    {
+      "path": "/Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags/build/bdx_optics/farm_test/campaign/results/bgo1_d20_j000000.hipo",
+      "sha256": "aba2a021cbdf7e471c37757967a5e2944c88eb2a8daf47e46f80d7e580e26688",
+      "events": 2,
+      "crystal_type": 1,
+      "distance_mm": 20.0,
+      "receipt": true,
+      "seed": 1810697825
+    },
+    {
+      "path": "/Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags/build/bdx_optics/farm_test/campaign/results/bgo1_d20_j000001.hipo",
+      "sha256": "78dcbc71685f288b63a016489451ec665b90c5a5938005242ae3c9d5f657b23b",
+      "events": 1,
+      "crystal_type": 1,
+      "distance_mm": 20.0,
+      "receipt": true,
+      "seed": 26053999
+    },
+    {
+      "path": "/Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags/build/bdx_optics/farm_test/campaign/results/bgo8_d20_j000000.hipo",
+      "sha256": "81773c050f625a6399c8c1e3789cce2e6d1f337f96c7ca7f09d284185132f8b2",
+      "events": 2,
+      "crystal_type": 8,
+      "distance_mm": 20.0,
+      "receipt": true,
+      "seed": 1951756601
+    },
+    {
+      "path": "/Users/simone/Work/JLAB/BDX/bdx-crystals/clas12Tags/build/bdx_optics/farm_test/campaign/results/bgo8_d20_j000001.hipo",
+      "sha256": "c38cb546ee5cc068bd1ac8c685b389cbbfeebe63ea49fe0a72648f11fef18b1a",
+      "events": 1,
+      "crystal_type": 8,
+      "distance_mm": 20.0,
+      "receipt": true,
+      "seed": 173095975
+    }
+  ],
+  "points": [
+    {
+      "crystal_type": 1,
+      "distance_mm": 20.0,
+      "files": 2,
+      "events": 3,
+      "edep_MeV": 125.17379281825453,
+      "generated_scint": 9872,
+      "arrived_scint": 46,
+      "collection_efficiency": 0.004659643435980551,
+      "efficiency_event_sem": 0.0003398199325239522,
+      "efficiency_photon_wilson68_low": 0.004022591097056499,
+      "efficiency_photon_wilson68_high": 0.0053970381949520075,
+      "arrived_per_MeV": 0.36748906431867473,
+      "arrived_per_MeV_event_sem": 0.02333923696127371,
+      "generated_per_MeV": 78.86634875986863,
+      "arrived_per_MeV_divided_by_input_yield": 0.004593613303983434,
+      "edep_axial_distance_mm": 19.889437406795377,
+      "max_optical_steps": 181,
+      "boundary_repairs": 0,
+      "max_boundary_shift_mm": 1.0000000021619605e-06,
+      "secondary_birth_repairs": 0,
+      "max_birth_shift_mm": 0.0
+    },
+    {
+      "crystal_type": 8,
+      "distance_mm": 20.0,
+      "files": 2,
+      "events": 3,
+      "edep_MeV": 215.67115755062133,
+      "generated_scint": 17381,
+      "arrived_scint": 59,
+      "collection_efficiency": 0.0033945112479143893,
+      "efficiency_event_sem": 0.00010319135982133131,
+      "efficiency_photon_wilson68_low": 0.002980992876985057,
+      "efficiency_photon_wilson68_high": 0.0038651698200578605,
+      "arrived_per_MeV": 0.2735646280664664,
+      "arrived_per_MeV_event_sem": 0.008514284649609254,
+      "generated_per_MeV": 80.59028475293648,
+      "arrived_per_MeV_divided_by_input_yield": 0.0034195578508308304,
+      "edep_axial_distance_mm": 20.048325878405098,
+      "max_optical_steps": 105,
+      "boundary_repairs": 0,
+      "max_boundary_shift_mm": 1.0000000022244959e-06,
+      "secondary_birth_repairs": 0,
+      "max_birth_shift_mm": 0.0
+    }
+  ],
+  "normalisation": "ratio of total selected scintillation arrivals to total generated scintillation photons",
+  "uncertainty": "event-cluster ratio SEM; Wilson68 is photon counting precision only",
+  "analysis_sha256": "bb7b69f5f2c530ded1f20ebe2f72f167ea5064fde60c67ff259942b14710ed3d",
+  "statistics_sha256": "0ccf7f8e2943ee87f642d6cff70a68a9b53557ae0c3ef68b04b7b3e3728c3c48",
+  "reader_sha256": "79ba459b0301b8a1805f1f800e0c296008f96f602d04bbb2147ca069ed817b4e",
+  "plotting_version": "3.10.8"
+}

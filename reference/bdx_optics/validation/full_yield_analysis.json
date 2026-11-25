@@ -1,0 +1,32 @@
+{
+  "normalisation": "ratio of total scintillation arrivals to total generated scintillation photons",
+  "uncertainty": "event cluster SEM; photon Wilson68 interval is counting precision only",
+  "units": {
+    "distance": "mm",
+    "energy": "MeV"
+  },
+  "analysis_code_sha256": "4c84ee3d63d13b15db2433483bef25b286399005638b7af7ecd02a138d33273c",
+  "plotting_library": "matplotlib",
+  "plotting_version": "3.10.8",
+  "campaign_sha256": "94fa57bf99d3e115d42b4ccbcadaa22521b94d27749177a7702dbeed4cff3a3d",
+  "points": [
+    {
+      "crystal_type": 8,
+      "distance_mm": 120.0,
+      "events": 2,
+      "edep_MeV": 77.3727695947,
+      "generated_scint": 658585,
+      "arrived_scint": 6202,
+      "collection_efficiency": 0.009417159516235566,
+      "efficiency_event_sem": 0.00018508610939184297,
+      "efficiency_photon_wilson68_low": 0.00929888779656423,
+      "efficiency_photon_wilson68_high": 0.009536921042372522,
+      "arrived_per_MeV": 80.15739946350368,
+      "arrived_per_MeV_event_sem": 1.6524826307094915,
+      "generated_per_MeV": 8511.844715522666,
+      "arrived_per_MeV_divided_by_input_yield": 0.009430282289823962,
+      "edep_axial_distance_mm": 119.9998232975233,
+      "max_optical_steps": 744
+    }
+  ]
+}

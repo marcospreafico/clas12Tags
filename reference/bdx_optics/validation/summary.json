@@ -1,0 +1,29 @@
+{
+  "validation": "numerical implementation checks; not experimental calibration",
+  "unit_checks": 6,
+  "native_transport_checks": 15,
+  "all_types_points": 24,
+  "all_types_events": 72,
+  "all_types_generated_scint": 277651,
+  "full_yield_events": 2,
+  "full_yield_generated_scint": 658585,
+  "configuration": "white paint, R=0.98, diffuse/mixed/specular lengths 40/100/100 mm, ideal 3x3 mm2 SiPM",
+  "software": "GEMC frederic + BDX optics hooks; Geant4 10.7.4; pinned official Docker image",
+  "source_sha256": {
+    "source/src/BdxCrystalOptics.cc": "a240125a67234cb5b7b4a477813c5fe80f79ea70a58473465b404131a93f505d",
+    "source/src/BdxCrystalOptics.h": "01bdc6874b62f88f1d0606ac591ff4b538e84195bd44da3f7f6f08cea9005c84",
+    "source/src/MDetectorConstruction.cc": "8ec3f9ea789a79dbbb789369a192ef536b876b411dbefdb5af2eb3e6b262c509",
+    "source/src/MSteppingAction.cc": "8458ac603aeee8ac8ae854a7e1c5ab52271d3b075b77dc0f56184e7abe289cab",
+    "source/src/MEventAction.cc": "6d6df6e7464a38db9775c127328f3354ba61785de21726f2fbaf73edb628567e",
+    "source/physics/PhysicsList.cc": "4315f2f97ce8c4da40c9d4b8357edf145c8b27809728f5227729b50c6dd3a525",
+    "scripts/bdx_geometry.py": "014c2edb3f297e677c8f03ffbeb0493b4fb9a4d0ba0f1f1e883926d608dcb658",
+    "scripts/run_bdx_optics.py": "072bf5f9ae053035274a107921a9a8452030bb633a20ef875ece193ed9c94805",
+    "scripts/analyze_bdx_optics.py": "4c84ee3d63d13b15db2433483bef25b286399005638b7af7ecd02a138d33273c",
+    "scripts/test_bdx_optics.sh": "c3cd4267b550476d6884550934af1af7027030a57506065918125b9c3a277877",
+    "scripts/build_bdx_optics.sh": "dd9656a7ab0d96451f86374efcf11c0cad2275d244dfc2379a0ff8ea2f07e694",
+    "tests/bdx_optics/test_geometry_analysis.py": "2bbf1cbd6b7e5398251ba3032e60acc6a8499fe93ce736476918b59ce47818f3",
+    "tests/bdx_optics/transport_test.cc": "fa64cda6227377f8b318319e863d254f04c67bcb4cb3ddc6fb270df4bea702e0",
+    "tests/bdx_optics/run_transport_checks.py": "39c06d7c03e0042582bdef2214f1fd420792f266f3cf87eb54f174709feea9cb",
+    "experiments/bdx_optics/geometry_only.conf": "a77f8170bbc52780e3311e12548529eca6c909dd04218f2ea7004fce806fb678"
+  }
+}

@@ -38,3 +38,14 @@ geometry_source/rich/cad/
 experiments/bdx/edep.txt
 source/gemc
 source/lib/*.a
+
+# BDX optics generated runs and native checks
+build/bdx_optics/
+experiments/bdx_optics/__pycache__/
+scripts/__pycache__/
+tests/bdx_optics/__pycache__/
+
+# Private JLab native releases and site configuration
+farm/build/
+farm/ifarm.env
+farm/__pycache__/

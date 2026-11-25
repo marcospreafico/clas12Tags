@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "unit_tests": 6,
+  "native_transport_tests": 16,
+  "geometry_point_checks": 48067,
+  "original_failing_seed": 2010314138,
+  "light_yield_per_MeV": 800,
+  "fix": "Conservative scalar safety and stable directional roots for original BGO GenericTrap surfaces; bounded boundary/birth rounding correction; native scintillation positions retained",
+  "campaigns": {
+    "original_point_10_events": {
+      "directory": "build/bdx_optics/regression_user_800_final",
+      "points": 1,
+      "events": 10,
+      "generated_scint": 346785,
+      "arrived_scint": 5555,
+      "max_boundary_shift_mm": 1.00000000223e-06,
+      "secondary_birth_repairs": 0
+    },
+    "all_32_points_1_event": {
+      "directory": "build/bdx_optics/regression_32_points_800_final",
+      "points": 32,
+      "events": 32,
+      "generated_scint": 1105451,
+      "arrived_scint": 11903,
+      "max_boundary_shift_mm": 1.00000000422e-06,
+      "secondary_birth_repairs": 0
+    }
+  },
+  "source_sha256": {
+    "source/src/BdxCrystalOptics.cc": "3b6ee5056420fa64c49f6b39460c3041a58fca8ff1e6b782160e0d10b071a013",
+    "source/src/BdxCrystalOptics.h": "375bf1915a89df08a1e5156d4d1b7b68c60ebd428002abb0792d0e8f218227c7",
+    "scripts/run_bdx_optics.py": "abc5a3c670f99090c16efb1ad18065b890d422b885e4e20cb0cd8e62da353c66",
+    "scripts/analyze_bdx_optics.py": "4a5fc1943999a05be51662a005fcf7a20a889afbe7eb7be5bc9291ad09d634af",
+    "scripts/test_bdx_optics.sh": "633c8fef96660f9170eb7338a6c6688be6af044a718f37b82eace561b8fa591b",
+    "tests/bdx_optics/relocation_test.cc": "f2af7709aeb79eef160e1c27d6886819cc407ae2eeb5069f045ea0bd3a870ae7",
+    "tests/bdx_optics/transport_test.cc": "c20dd082fc890a1c78aa48a52c24572dc0954fa393f19b7014899a34363395f7",
+    "tests/bdx_optics/run_transport_checks.py": "91f448231ffbd3d72d41d6d00440c2138283a3742d9f293a69772ab6f16b5e65"
+  },
+  "gemc_sha256": "f02882ef00a4e4f5660d31347339836b4503b0aab239865fc00cb68ab0e95f5b"
+}

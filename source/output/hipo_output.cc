@@ -1,5 +1,8 @@
 // gemc headers
 #include "hipo_output.h"
+#include "../src/BdxCrystalOptics.h"
+#include "../src/BdxOpticalSchema.h"
+#include <stdexcept>
 #include "gemcUtils.h"
 
 // C++ headers
@@ -146,6 +149,7 @@ void hipo_output::writeHeader(outputContainer *output, map<string, double> data,
 
     runConfigBank.putInt("run", 0, data["runNo"]);
     runConfigBank.putInt("event", 0, data["evn"]);
+    bdxGemcEvent=static_cast<int>(data["evn"]);
 
     // time in seconds
     time_t t = std::time(0);
@@ -183,7 +187,7 @@ void hipo_output::writeHeader(outputContainer *output, map<string, double> data,
 
 
     // RASTER constant initialization
-    if (rasterInitialized == -99) {
+    if (rasterInitialized == -99 && !bdxoptics::Enabled()) {
 
         // loading raster p0 and p1 from CCDB
         string digiVariation = output->gemcOpt.optMap["DIGITIZATION_VARIATION"].args;
@@ -430,7 +434,8 @@ void hipo_output::writeGenerated(outputContainer *output, vector <generatedParti
     }
     outEvent->addStructure(lundParticleBank);
 
-
+    // No CLAS12 raster or calibration in the isolated BDX study.
+    if(bdxoptics::Enabled()) return;
 
     // raster:
     // sector=0
@@ -898,6 +903,11 @@ void hipo_output::writeFADCMode7(outputContainer *output, vector <hitOutput> HO,
 void hipo_output::writeEvent(outputContainer *output) {
     outEvent->addStructure(*trueInfoBank);
 
-    output->hipoWriter->addEvent(*outEvent);
+    if(bdxoptics::Enabled()) {
+        bdxoptics::AppendHipo(*outEvent,output->hipoWriter->getDictionary(),bdxGemcEvent);
+        // Optical events can exceed HIPO's default 8 MiB record buffer. Use an
+        // explicitly sized record and check insertion, preserving one MC event.
+        bdxoptics::WriteOpticalRecord(*output->hipoWriter,*outEvent);
+    } else output->hipoWriter->addEvent(*outEvent);
 
 }

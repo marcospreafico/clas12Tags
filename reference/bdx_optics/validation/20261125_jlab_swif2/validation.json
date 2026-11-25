@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "jobs": 4,
+  "events": 6,
+  "points": 2,
+  "symlink_input_staging": true,
+  "full_base_arrivals": 22739,
+  "square_3mm_arrivals": 105,
+  "generated_scint": 27253,
+  "raw_data_unchanged": true,
+  "large_bank_reduction": true,
+  "swif2_submitted": false
+}

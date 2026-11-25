@@ -3,6 +3,7 @@
 
 // gemc headers
 #include "MSteppingAction.h"
+#include "BdxCrystalOptics.h"
 
 MSteppingAction::MSteppingAction(goptions Opt)
 {
@@ -21,6 +22,7 @@ MSteppingAction::~MSteppingAction(){ cout << " > Closing Stepping Action." << en
 
 void MSteppingAction::UserSteppingAction(const G4Step* aStep)
 {
+	if(bdxoptics::Step(aStep)) return;
 	G4ThreeVector   pos   = aStep->GetPostStepPoint()->GetPosition();      ///< Global Coordinates of interaction
 	G4Track*        track = aStep->GetTrack();
 

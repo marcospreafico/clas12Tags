@@ -6,6 +6,7 @@
 
 // gemc headers
 #include "MEventAction.h"
+#include "BdxCrystalOptics.h"
 #include "Hit.h"
 
 // mlibrary
@@ -197,6 +198,7 @@ MEventAction::~MEventAction()
 
 void MEventAction::BeginOfEventAction(const G4Event* evt)
 {
+	bdxoptics::BeginEvent(evt);
 	G4RunManager *runManager = G4RunManager::GetRunManager();;
 	if(gen_action->isFileOpen() == false) {
 		runManager->AbortRun();
@@ -253,6 +255,7 @@ void MEventAction::BeginOfEventAction(const G4Event* evt)
 
 void MEventAction::EndOfEventAction(const G4Event* evt)
 {
+	bdxoptics::EndEvent(evt);
 
 	if ((gen_action->isFileOpen() == false) ||
 		 (gen_action->doneRerun() == true))

@@ -1,0 +1,157 @@
+[
+  {
+    "name": "ideal_sensor",
+    "events": 100,
+    "arrivals": 100,
+    "expected_fraction": 1,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "outside_aperture",
+    "events": 100,
+    "arrivals": 0,
+    "expected_fraction": 0,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "specular_one_bounce",
+    "events": 6000,
+    "arrivals": 5087,
+    "expected_fraction": 0.85,
+    "max_steps": 2,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "bare_escape",
+    "events": 100,
+    "arrivals": 0,
+    "expected_fraction": 0,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "bulk_absorption",
+    "events": 6000,
+    "arrivals": 3621,
+    "expected_fraction": 0.6065306597126334,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "total_internal_reflection",
+    "events": 100,
+    "arrivals": 100,
+    "expected_fraction": 1,
+    "max_steps": 2,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "bare_normal_escape",
+    "events": 100,
+    "arrivals": 0,
+    "expected_fraction": 0,
+    "max_steps": 3,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "paint_zero_R",
+    "events": 100,
+    "arrivals": 100,
+    "expected_fraction": 1,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "paint_zero_R_outside",
+    "events": 100,
+    "arrivals": 0,
+    "expected_fraction": 0,
+    "max_steps": 1,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "long_ray_no_cut",
+    "events": 20,
+    "arrivals": 20,
+    "expected_fraction": 1,
+    "max_steps": 102,
+    "status": "passed",
+    "first_outcomes": null
+  },
+  {
+    "name": "paint_diffuse_zone",
+    "events": 6000,
+    "arrivals": 300,
+    "expected_fraction": null,
+    "max_steps": 435,
+    "status": "passed",
+    "first_outcomes": [
+      5871,
+      0,
+      129
+    ]
+  },
+  {
+    "name": "paint_mixed_zone",
+    "events": 6000,
+    "arrivals": 195,
+    "expected_fraction": null,
+    "max_steps": 448,
+    "status": "passed",
+    "first_outcomes": [
+      2887,
+      2996,
+      117
+    ]
+  },
+  {
+    "name": "paint_specular_zone",
+    "events": 6000,
+    "arrivals": 0,
+    "expected_fraction": null,
+    "max_steps": 408,
+    "status": "passed",
+    "first_outcomes": [
+      0,
+      5867,
+      133
+    ]
+  },
+  {
+    "name": "boundary_tolerance_small",
+    "events": 6000,
+    "arrivals": 197,
+    "expected_fraction": null,
+    "max_steps": 408,
+    "status": "passed",
+    "first_outcomes": [
+      2893,
+      2994,
+      113
+    ]
+  },
+  {
+    "name": "boundary_tolerance_large",
+    "events": 6000,
+    "arrivals": 197,
+    "expected_fraction": null,
+    "max_steps": 392,
+    "status": "passed",
+    "first_outcomes": [
+      2900,
+      2983,
+      117
+    ]
+  }
+]

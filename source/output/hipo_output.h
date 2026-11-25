@@ -90,6 +90,7 @@ public:
 	// write event and close stream if necessary
 	void writeEvent(outputContainer*) ;
 
+	int bdxGemcEvent = 0;
 	hipo::event *outEvent = nullptr;
 	hipo::bank *trueInfoBank = nullptr;
 

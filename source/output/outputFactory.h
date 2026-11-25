@@ -31,9 +31,11 @@
 #include "hipoSchemas.h"
 
 //evio
+#ifndef BDX_NO_EVIO
 #include "evioUtil.hxx"
 #include "evioFileChannel.hxx"
 using namespace evio;
+#endif
 
 // geant4
 #include "G4ThreeVector.hh"
@@ -246,7 +248,9 @@ public:
 
 	ofstream        *txtoutput;
 	
-    evioFileChannel *pchan; 
+#ifndef BDX_NO_EVIO
+    evioFileChannel *pchan;
+#endif
 
 	// hipo schema and writer
 	// The schemas have to be added to the writer before openning

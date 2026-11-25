@@ -4,7 +4,9 @@
 #include "string_utilities.h"
 
 #include "hipo_output.h"
+#ifndef BDX_NO_EVIO
 #include "evio_output.h"
+#endif
 #include "txt_output.h"
 #include "txt_simple_output.h"
 
@@ -54,8 +56,12 @@ outputContainer::outputContainer(goptions Opts)
 	}
     
     if(outType == "evio"){
+#ifndef BDX_NO_EVIO
         pchan = new evioFileChannel(trimSpacesFromString(outFile).c_str(), "w", evio_buffer);
-        pchan->open(); 
+        pchan->open();
+#else
+        throw std::runtime_error("This BDX build has EVIO disabled; use CSV or HIPO output.");
+#endif
     }
 
 }
@@ -78,10 +84,12 @@ outputContainer::~outputContainer()
 		cout << hd_msg << " Closing Hipo file \"" << trimSpacesFromString(outFile) << "\"." << endl;
 		hipoWriter->close();
 	}
+#ifndef BDX_NO_EVIO
     if(outType == "evio"){
         pchan->close();
         delete pchan;
     }
+#endif
 
 }
 
@@ -92,7 +100,9 @@ map<string, outputFactoryInMap> registerOutputFactories()
 
 	outputMap["txt"]        = &txt_output::createOutput;
 	outputMap["txt_simple"] = &txt_simple_output::createOutput;
+#ifndef BDX_NO_EVIO
     outputMap["evio"]       = &evio_output::createOutput;
+#endif
 	outputMap["hipo"]       = &hipo_output::createOutput;
 
 	return outputMap;
